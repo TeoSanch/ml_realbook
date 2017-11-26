@@ -1,0 +1,4 @@
+# Machine Learning Project : Generation of lead sheets and inference in jazz
+
+This project aims to generate lead sheets of jazz music, represented as coherent chord label sequences with the help of probabilistic models. The motivation for this approach comes from a recent article on text-based LSTM networks for automatic music composition (Choi, 2015). In this paper, the authors use a recurrent neural network (RNN-LSTM) to generate symbolic chord sequences. They focus on two different approaches named word-RNN and char-RNN. These two variants use the same model architecture but rely on different learning methods. In this project, we will improve the word-RNN approach by injecting music theory knowledge through the learning method in order to be able to perform accurate prediction of chord sequence and jazz melody generation. 
+Ultimately, this project could be used to perform automatic accompaniment and improvisation.
