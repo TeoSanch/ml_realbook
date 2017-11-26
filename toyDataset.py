@@ -341,8 +341,4 @@ Each chord will last 2 beats. n is the length of the sequence.
 The function descending_modulate_progression(n) generates ii-V-I chord 
 progression with modulation for each iteration, the I chord becoming the ii 
 chord of the next modulation. Chords ii and V on first bar, chord I on second 
-bar. n is the length of the sequence.
-        
-    
-        
-    
+bar. n is the length of the sequence."""
