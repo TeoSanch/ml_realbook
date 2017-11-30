@@ -14,6 +14,7 @@ from encoding import *
 from model import *
 from training import *
 from generation import *
+from keras.models import load_model
 
 def ParseInput():
     """ Parse the input text file into a python array and build the alphabet
@@ -34,11 +35,13 @@ def ParseInput():
     return chord_seq, chars, (char_indices, indices_char)
   
 def SaveModel(model, name, pathmodel='./Models/'):
-    from keras.models import load_model
     date = time.ctime()
     date = date.replace(' ', '_')
-    print('Save model as ' + name + date + '.h5' + '...')
-    model.save(pathmodel + name + '_' + date + '.h5')
+    date = date.replace(':', '-')
+    print('Save model as ' + name + '_' + date + '.h5' + '...')
+    filepath = pathmodel + name + '_' + date + '.h5'
+    model.save(filepath)
+    return model
     
 def LoadModel():
     Tk().withdraw()
@@ -61,7 +64,7 @@ def main():
         nb_epoch = int(input('Number of epochs = '))
         model = GetModel(batch_size, sentence_len, len(alphabet))
         SimpleTrain(model, x, y, batch_size, nb_epoch)
-        SaveModel(model, name, pathmodel=('./Models/'))
+        SaveModel(model, name,'./Models/')
     elif c1 == 'G':
         model = LoadModel()
         
