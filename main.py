@@ -4,51 +4,12 @@ Created on Wed Nov 29 17:01:29 2017
 
 @author: teo
 """
-#from tkinter import filedialog
-#from tkinter import *
- 
-from tkinter import Tk
-from tkinter import filedialog
-import time
+
 from encoding import *
 from model import *
 from training import *
 from generation import *
 from keras.models import load_model
-
-def ParseInput():
-    """ Parse the input text file into a python array and build the alphabet
-    """
-    print('Choose an text input file')
-    Tk().withdraw() # we don't want a full GUI, so keep the root window from appearing
-    filename = filedialog.askopenfilename(filetypes = (("Template files", "*.txt"), ("All files", "*"))) # show an "Open" dialog box and return the path to the selected file
-    print('Database : ' + filename)
-    print('Parsing input file...')
-    fd = open(filename).read()
-    print('Corpus length:', len(fd))
-    chord_seq = fd.split(' ')
-    chars = set(chord_seq)
-    char_indices = dict((c, i) for i, c in enumerate(chars))    #Mapping : une numéro par mot
-    indices_char = dict((i, c) for i, c in enumerate(chars))
-    alphabet_len = len(char_indices)
-    print('Alphabet size : ', alphabet_len)
-    return chord_seq, chars, (char_indices, indices_char)
-  
-def SaveModel(model, name, pathmodel='./Models/'):
-    date = time.ctime()
-    date = date.replace(' ', '_')
-    date = date.replace(':', '-')
-    print('Save model as ' + name + '_' + date + '.h5' + '...')
-    filepath = pathmodel + name + '_' + date + '.h5'
-    model.save(filepath)
-    return model
-    
-def LoadModel():
-    Tk().withdraw()
-    filename = filedialog.askopenfilename(filetypes = (("Template files", "*.h5"), ("All files", "*")))
-    model = load_model(filename)
-    return model
-
 
 
 def main():
