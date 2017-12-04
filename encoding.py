@@ -38,19 +38,26 @@ def GetSentences(inputs, sentence_len, step):
     print('number of sequences :', len(sentences))
     return sentences, next_chars
 
-def Encode(sentences, next_chars, mapping):
-    alphabet_len = len(mapping[0])
-    sentence_len = len(sentences[0])
-    print('Vectorization...')
-    x = np.zeros((len(sentences), sentence_len, alphabet_len), dtype=np.bool)
-    y = np.zeros((len(sentences), alphabet_len), dtype=np.bool)
-    for i, sentence in enumerate(sentences):
-        for t, char in enumerate(sentence):
-            x[i, t, mapping[0][char]] = 1
-        y[i, mapping[0][next_chars[i]]] = 1
-    return x, y
-    
-#def Decode()
+def Encode(sentences, mapping, next_chars = None):
+    if next_chars != None:
+        nb_sentences = len(sentences)
+        alphabet_len = len(mapping[0])
+        sentence_len = len(sentences[0])
+        x = np.zeros((nb_sentences, sentence_len, alphabet_len), dtype=np.bool)
+        y = np.zeros((nb_sentences, alphabet_len), dtype=np.bool)
+        for i, sentence in enumerate(sentences):
+            for t, char in enumerate(sentence[:]):
+                x[i, t, mapping[0][char]] = 1
+            y[i, mapping[0][next_chars[i]]] = 1
+        return x, y
+    else :
+        nb_sentence = 1
+        alphabet_len = len(mapping[0])
+        sentence_len = len(sentences)
+        x = np.zeros((nb_sentence, sentence_len, alphabet_len), dtype=np.bool)
+        for i, char in enumerate(sentences):
+            x[0][i, mapping[0][char]] = 1
+        return x
 
 
 

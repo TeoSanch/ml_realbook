@@ -9,7 +9,6 @@ from encoding import *
 from model import *
 from training import *
 from generation import *
-from keras.models import load_model
 
 
 def main():
@@ -24,8 +23,16 @@ def main():
         batch_size = int(input('Batch size = '))
         nb_epoch = int(input('Number of epochs = '))
         model = GetModel(batch_size, sentence_len, len(alphabet))
-        SimpleTrain(model, x, y, batch_size, nb_epoch)
+        history = RefinedTrain(model, x, y, batch_size, nb_epoch)
         SaveModel(model, name,'./Models/')
     elif c1 == 'G':
         model = LoadModel()
+        sentence_len = model.get_config()[0]['config']['batch_input_shape'][1]
+        name = input('Name of the generated sequence : ')
+        inputs, alphabet, mapping = ParseInput()
+        seed = input('Seed chords : ')
+        nb_iteration = int(input('Number of generated chords = '))
+        temperature = float(input('Temperature = '))
+        generation = GenerateSentence(model, inputs, seed, nb_iteration, temperature, sentence_len, mapping)
+        print(generation)
         
