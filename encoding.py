@@ -15,7 +15,7 @@ def ParseInput():
     """
     print('Choose an text input file')
     Tk().withdraw() # we don't want a full GUI, so keep the root window from appearing
-    filename = filedialog.askopenfilename(filetypes = (("Template files", "*.txt"), ("All files", "*"))) # show an "Open" dialog box and return the path to the selected file
+    filename = filedialog.askopenfilename(initialdir = './Inputs/',filetypes = (("Template files", "*.txt"), ("All files", "*"))) # show an "Open" dialog box and return the path to the selected file
     print('Database : ' + filename)
     print('Parsing input file...')
     fd = open(filename).read()

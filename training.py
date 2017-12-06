@@ -25,7 +25,7 @@ def SaveModel(model, name, pathmodel='./Models/'):
 def LoadModel():
     print('Load model...')
     Tk().withdraw()
-    filename = filedialog.askopenfilename(filetypes = (("Template files", "*.h5"), ("All files", "*")))
+    filename = filedialog.askopenfilename(initialdir = './Models/', filetypes = (("Template files", "*.h5"), ("All files", "*")))
     model = load_model(filename)
     print(filename + ' loaded')
     return model

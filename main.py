@@ -9,11 +9,11 @@ from encoding import *
 from model import *
 from training import *
 from generation import *
-
+import os.path
 
 def main():
-    c1 = input('Train or generate? [T/G] ')
-    if c1 == 'T':
+    c1 = input('Train or generate? [t/g] ')
+    if c1 == 't':
         name = input('Name of the training : ')
         inputs, alphabet, mapping = ParseInput()
         sentence_len = int(input('Sentence length = '))
@@ -25,14 +25,33 @@ def main():
         model = GetModel(batch_size, sentence_len, len(alphabet))
         history = RefinedTrain(model, x, y, batch_size, nb_epoch)
         SaveModel(model, name,'./Models/')
-    elif c1 == 'G':
+    elif c1 == 'g':
+        name = input('Name of the generated file : ')
         model = LoadModel()
         sentence_len = model.get_config()[0]['config']['batch_input_shape'][1]
-        name = input('Name of the generated sequence : ')
         inputs, alphabet, mapping = ParseInput()
-        seed = input('Seed chords : ')
-        nb_iteration = int(input('Number of generated chords = '))
-        temperature = float(input('Temperature = '))
-        generation = GenerateSentence(model, inputs, seed, nb_iteration, temperature, sentence_len, mapping)
-        print(generation)
-        
+        loop = True
+        while loop:
+            nb_iteration = int(input('Number of generated chords = '))
+            seed = input('Seed chords : ')
+            determinist = input('Deterministic generation ? [y, n]')
+            if determinist == 'y':
+                d = True
+            elif determinist == 'n':
+                d = False
+            temperature = float(input('Temperature = '))
+            generation = GenerateSentence(model, inputs, seed, nb_iteration, temperature, sentence_len, mapping, d)
+            print(generation)
+            c2 = input('Save output/Generate again/Quit? [s/g/q] ')
+            if c2 == 's':
+                print('Writing outputs...')
+                subdirectory = os.getcwd() + '\\Outputs'
+                fd = open(os.path.join(subdirectory, name + '.out'), 'a')
+                fd.writelines(["%s\n" % item  for item in generation])
+                fd.close()
+                print('Written')
+            elif c2 == 'g':
+                loop = True
+            else :
+                loop = False
+
