@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 
 
 def SaveModel(model, name, pathmodel='./Models/'):
+    '''Save a model (named with name and the actual date) in the required ./Models directory'''
     print('Save model to ...')
     date = time.ctime()
     date = date.replace(' ', '_')
@@ -23,6 +24,7 @@ def SaveModel(model, name, pathmodel='./Models/'):
     return model
     
 def LoadModel():
+    ''' Load choosen model in the ./Models directory'''
     print('Load model...')
     Tk().withdraw()
     filename = filedialog.askopenfilename(initialdir = './Models/', filetypes = (("Template files", "*.h5"), ("All files", "*")))
@@ -31,15 +33,18 @@ def LoadModel():
     return model
     
 def SimpleTrain(model, x, y, batch, nb_epochs):
+    '''Keras training launch command'''
     model.fit(x, y, batch_size = batch, epochs = nb_epochs, verbose = 1)
 
 
 def RefinedTrain(model, x, y, batch, nb_epochs):
+    '''Keras training with plot of the accuracy evolution through epochs'''
     history = model.fit(x, y , batch_size = batch, epochs = nb_epochs, verbose = 1, validation_split = 0.2).history
     Evaluate(history)
     return history
 
 def Evaluate(history):
+    '''Plot accuracy through epochs'''
     plt.plot(history['acc'])
     plt.plot(history['val_acc'])
     plt.title('model accuracy')

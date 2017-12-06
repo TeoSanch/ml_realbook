@@ -12,6 +12,7 @@ from generation import *
 import os.path
 
 def main():
+    ''' User interface to launch training, or generation using a trained model'''
     c1 = input('Train or generate? [t/g] ')
     if c1 == 't':
         name = input('Name of the training : ')
@@ -19,19 +20,19 @@ def main():
         sentence_len = int(input('Sentence length = '))
         step = int(input('Step = '))
         sentences, next_chars = GetSentences(inputs, sentence_len, step)
-        x, y = Encode(sentences, next_chars, mapping)
+        x, y = Encode(sentences, mapping, next_chars)
         batch_size = int(input('Batch size = '))
         nb_epoch = int(input('Number of epochs = '))
         model = GetModel(batch_size, sentence_len, len(alphabet))
         history = RefinedTrain(model, x, y, batch_size, nb_epoch)
         SaveModel(model, name,'./Models/')
     elif c1 == 'g':
-        name = input('Name of the generated file : ')
         model = LoadModel()
         sentence_len = model.get_config()[0]['config']['batch_input_shape'][1]
         inputs, alphabet, mapping = ParseInput()
         loop = True
         while loop:
+            name = input('Name of the generated file : ')
             nb_iteration = int(input('Number of generated chords = '))
             seed = input('Seed chords : ')
             determinist = input('Deterministic generation ? [y, n]')

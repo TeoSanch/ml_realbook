@@ -11,11 +11,10 @@ from tkinter import filedialog
 
 
 def ParseInput():
-    """ Parse the input text file into a python array and build the alphabet
-    """
+    """ Parse the input text file ( in the ./Inputs directory) into a python list and build the alphabet and the mapping (indices to chords and chords to indices)"""
     print('Choose an text input file')
     Tk().withdraw() # we don't want a full GUI, so keep the root window from appearing
-    filename = filedialog.askopenfilename(initialdir = './Inputs/',filetypes = (("Template files", "*.txt"), ("All files", "*"))) # show an "Open" dialog box and return the path to the selected file
+    filename = filedialog.askopenfilename(initialdir = './Inputs/',filetypes = (("Template files", "*.txt"), ("All files", "*")))
     print('Database : ' + filename)
     print('Parsing input file...')
     fd = open(filename).read()
@@ -30,6 +29,7 @@ def ParseInput():
 
 
 def GetSentences(inputs, sentence_len, step):
+    '''Split the input list into size defined sentences. A step can be defined.'''
     sentences = []
     next_chars = []
     for i in range(0, len(inputs) - sentence_len, step):
@@ -39,6 +39,7 @@ def GetSentences(inputs, sentence_len, step):
     return sentences, next_chars
 
 def Encode(sentences, mapping, next_chars = None):
+    '''Encode the sentences through time into a 3-dimentionnal boolean array'''
     if next_chars != None:
         nb_sentences = len(sentences)
         alphabet_len = len(mapping[0])

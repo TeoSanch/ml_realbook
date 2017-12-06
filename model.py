@@ -11,6 +11,7 @@ from keras.layers.core import Dense, Activation, Dropout
 from keras.layers.recurrent import LSTM
 
 def GetModel(statelen, sentence_len, numchars):
+    ''' Generate the LSTM Keras Model described in the K. Choi work'''
     print('Build model...')
     model = Sequential()
     model.add(LSTM(statelen, return_sequences = True, input_shape = (sentence_len, numchars)))
