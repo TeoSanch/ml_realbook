@@ -38,6 +38,7 @@ def GenerateWord(sentence, model, temperature, mapping):
     prediction = model.predict(x, verbose=0)[0]
     next_index = Sample(prediction, temperature)
     next_char = mapping[1][next_index]
+    print(next_char)
     return next_char
         
 def GetSeed(seed, inputs, sentence_len, determinism = True):

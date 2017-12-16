@@ -18,8 +18,8 @@ def ParseInput():
     print('Database : ' + filename)
     print('Parsing input file...')
     fd = open(filename).read()
-    print('Corpus length:', len(fd))
     chord_seq = fd.split(' ')
+    print('Corpus length:', len(chord_seq))
     chars = set(chord_seq)
     char_indices = dict((c, i) for i, c in enumerate(chars))    #Mapping : une numéro par mot
     indices_char = dict((i, c) for i, c in enumerate(chars))

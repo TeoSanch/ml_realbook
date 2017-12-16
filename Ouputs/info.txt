@@ -1,0 +1,1 @@
+Here is where the generated sequences are saved. The statistics.py program evaluate some statistic about the outputs.
