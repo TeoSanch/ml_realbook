@@ -10,6 +10,7 @@ from keras.models import Sequential
 from keras.layers.core import Dense, Activation, Dropout
 from keras.layers.recurrent import LSTM
 
+
 def GetModel(statelen, sentence_len, numchars):
     ''' Generate the LSTM Keras Model described in the K. Choi work'''
     print('Build model...')

@@ -36,6 +36,9 @@ def main():
         model = LoadModel()
         sentence_len = model.get_config()[0]['config']['batch_input_shape'][1]
         inputs, alphabet, mapping = ParseInput()
+        preredutype = input('Pre-reduction? [a1/a2/a3/N]')
+        if preredutype != 'N':
+            inputs, alphabet, mapping = ReduSeq(inputs, preredutype)
         loop = True
         while loop:
             name = input('Name of the generated file : ')
@@ -46,14 +49,10 @@ def main():
                 d = True
             elif determinist == 'n':
                 d = False
-            postredutype = input('Type of pre-reduction [N/a0/a1/a2/a3]')
+            postredutype = input('Type of post-reduction [N/a0/a1/a2/a3]')
             temperature = float(input('Temperature = '))
             print(seed)
-            generation = GenerateSentence(model, inputs, seed, nb_iteration, temperature, sentence_len, mapping, d)
-            #print(generation)
-            if postredutype != 'N':
-                inputs, alphabet, mapping = ReduSeq(inputs, preredutype)
-                print(inputs)
+            generation = GenerateSentence(model, inputs, seed, nb_iteration, temperature, sentence_len, mapping, d, redu = postredutype)
             c2 = input('Save output/Generate again/Quit? [s/g/q] ')
             if c2 == 's':
                 print('Writing outputs...')

@@ -115,6 +115,7 @@ a2 = {
     'dim':     'dim',
     'sus4':    'N',
     'sus2':    'N',
+    'sus' : 'maj',
     '7':       '7',
     'maj7':    'maj7',
     'min7':    'min7',
