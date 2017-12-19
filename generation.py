@@ -8,8 +8,9 @@ Created on Sun Nov 26 01:14:26 2017
 
 import random
 from encoding import *
+from reduction import *
 
-def GenerateSentence(model, inputs, seed, nb_iteration, temperature, sentence_len, mapping, determinism = True):
+def GenerateSentence(model, inputs, seed, nb_iteration, temperature, sentence_len, mapping, determinism = True, redu = 'N'):
     '''Generate a number of word starting from a seed and a trained model
     Inputs : 
         model : the trained model
@@ -26,20 +27,26 @@ def GenerateSentence(model, inputs, seed, nb_iteration, temperature, sentence_le
     generated = seed_sentence
     sentence = seed_sentence
     for i in range(nb_iteration):
-        prediction = GenerateWord(sentence, model, temperature, mapping)
+        prediction = GenerateWord(sentence, model, temperature, mapping, redu = redu)
         sentence.append(prediction)
         sentence = sentence[1:]
         generated.append(prediction)
     return generated
 
-def GenerateWord(sentence, model, temperature, mapping):
+def GenerateWord(sentence, model, temperature, mapping, redu = 'N'):
     ''' Generate a single word'''
     x = Encode(sentence, mapping)
     prediction = model.predict(x, verbose=0)[0]
     next_index = Sample(prediction, temperature)
     next_char = mapping[1][next_index]
-    print(next_char)
-    return next_char
+    if redu != 'N':
+        next_char = ReduChord(next_char, redu)
+        print(next_char)
+        return next_char
+    else:
+        print(next_char)
+        return next_char
+
         
 def GetSeed(seed, inputs, sentence_len, determinism = True):
     ''' Starting from a sequence of chords, detect if the sequence is in the inputs and take a sequence adapted to the sentence length defined before

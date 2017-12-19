@@ -11,6 +11,43 @@ Created on Tue Nov 21 12:38:02 2017
 ----------------------------------------------------------------------"""
 #%%
 
+def convMetaLBC(audioSet,transformOptions):
+    #convInput = []
+    listBeatChord = [];
+    hopSizeS = (transformOptions["hopSize"] / transformOptions["resampleTo"]);
+    hopSizeMs = hopSizeS * 1000;
+    nbData = 0;
+    curData = 0;
+    nbBands = len(audioSet.data[1])
+    audioSet.metadata['listBeatChord'] = {};
+#Count the number of frames
+    for k in range(len(audioSet.data)):
+        nbData = nbData + len(audioSet.data[k][0]) - transformOptions["contextWindows"] + 1
+#Pre-allocate the windowed dataset
+        #local finalData = options.modelType == 'ladder' and torch.Tensor(nbData, nbBands * options.contextWindows) or torch.Tensor(nbData, nbBands, options.contextWindows);
+        #finalData = np.array(nbData, nbBands, options.contextWindows)
+    finalData = {}
+    #finalLabels = {};
+#-- Parse the whole set of windows
+    for k in range(len(audioSet.data)):
+        #print(k)
+        maxFrame = len(audioSet.data[k][0])
+        for numFrame in range(maxFrame - transformOptions["contextWindows"]  + 1):
+            nbrAcc = 0
+            while numFrame + (transformOptions["contextWindows"]  / 2) + 0.5 > (audioSet.metadata['chord'][k][0]['timeEnd'][nbrAcc] / hopSizeS) and nbrAcc+1 < len(audioSet.metadata['chord'][k][0]['timeStart']):
+                nbrAcc = nbrAcc+1;
+            curData = curData + 1;
+            #finalLabels[curData] = list(audioSet.metadata['chord'][k][0]['labels'][nbrAcc]);
+            finalData[curData] = audioSet.data[k][:, range(numFrame, numFrame + transformOptions["contextWindows"])];
+            finalData[curData] = (finalData[curData] - finalData[curData].mean()) / finalData[curData].max();
+            listBeatChord.append(audioSet.metadata['chord'][k][0]['labels'][nbrAcc]);
+#audioSet.data[k] = convInputTens;
+        audioSet.metadata['listBeatChord'][k] = listBeatChord;
+        listBeatChord = []
+    audioSet.data = finalData;
+    #audioSet.metadata['listBeatChord'] = finalLabels
+    return audioSet
+
 QUALITIES = {
     #           1     2     3     4  5     6     7
     'maj':     [1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0],
@@ -115,7 +152,6 @@ a2 = {
     'dim':     'dim',
     'sus4':    'N',
     'sus2':    'N',
-    'sus' : 'maj',
     '7':       '7',
     'maj7':    'maj7',
     'min7':    'min7',
@@ -174,61 +210,56 @@ a3 = {
     '': 'N'}
 
 gamme = {
-    'Ab':   'G#',
-    'A':    'A',
-    'A#':   'A#',
-    'Bb':   'A#',
-    'B':    'B',
-    'Cb':   'B',
-    'C':    'C',
-    'C#':   'C#',
-    'Db':   'C#',
-    'D':    'D',
-    'D#':   'D#',
-    'Eb':   'D#',
-    'E':    'E',
-    'E#':   'E#',
-    'Fb':   'E#',
-    'F':    'F',
-    'F#':   'F#',
-    'Gb':   'F#',
-    'G':    'G',
-    'G#':   'G#',
-    'N' :   'N',
-    '' :    'N'}
+### modifié par Octave
+    'ab':   'g#',
+    'a':    'a',
+    'a#':   'a#',
+    'bb':   'a#',
+    'b':    'b',
+    'cb':   'b',
+    'c':    'c',
+    'c#':   'c#',
+    'db':   'd#',
+    'd':    'd',
+    'd#':   'd#',
+    'eb':   'd#',
+    'e':    'e',
+    'e#':   'e#',
+    'fb':   'e#',
+    'f':    'f',
+    'f#':   'f#',
+    'gb':   'f#',
+    'g':    'g',
+    'g#':   'g#',
+    'n' :   'n',
+    '' :    'n'
+###
+    }
 
-def ReduChord(initChord, alpha= 'a1'):
-    def QualException(qual):
-        if qual == '6':
-            return 'maj6'
-        else:
-            return qual
-        
+def reduChord(initChord, alpha= 'a1'):
+
     if initChord == "":
         print("buuug")
-    if 'START' in initChord.upper():
-        return 'Start'
-    elif 'END' in initChord.upper():
-        return 'End'
     initChord, bass = initChord.split("/") if "/" in initChord else (initChord, "")
     root, qual = initChord.split(":") if ":" in initChord else (initChord, "")
     root, noChord = root.split("(") if "(" in root else (root, "")
     qual, bass = qual.split("(") if "(" in qual else (qual, "")
-      
-    
+
+#### modifié par Octave
+    root = root.lower()
+###
+
     root = gamme[root]
-    qual = QualException(qual)
-    
-    
+
     if qual == "":
         if root == "N" or noChord != "":
             finalChord = "N"
         else:
             finalChord = root + ':maj'
-    
+
     elif root == "N":
         finalChord = "N"
-    
+
     else:
         if alpha == 'a1':
                 qual = a1[qual]
@@ -246,13 +277,3 @@ def ReduChord(initChord, alpha= 'a1'):
             finalChord = root + ':' + qual
 
     return finalChord
-
-def ReduSeq(inputs, alpha = 'a1'):
-    print('Process reduction ' + alpha + ' ...')
-    new_inputs = list(map(lambda x: ReduChord(x, alpha), inputs))
-    new_chars = set(new_inputs)
-    char_indices = dict((c, i) for i, c in enumerate(new_chars))    #Mapping : une numéro par mot
-    indices_char = dict((i, c) for i, c in enumerate(new_chars))
-    alphabet_len = len(new_chars)
-    print('New alphabet size : ', alphabet_len)
-    return new_inputs, new_chars, (char_indices, indices_char)

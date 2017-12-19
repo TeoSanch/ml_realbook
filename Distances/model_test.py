@@ -9,7 +9,7 @@ Created on Sun Nov 26 00:10:19 2017
 from keras.models import Sequential
 from keras.layers.core import Dense, Activation, Dropout
 from keras.layers.recurrent import LSTM
-
+from wrapper import *
 
 def GetModel(statelen, sentence_len, numchars):
     ''' Generate the LSTM Keras Model described in the K. Choi work'''
@@ -22,5 +22,5 @@ def GetModel(statelen, sentence_len, numchars):
     model.add(Dense(numchars))
     model.add(Activation('softmax'))
     
-    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics = ['accuracy'])
+    model.compile(loss=[wrap_tonnetz(mapping = mapping)], optimizer='adam', metrics = ['accuracy', 'categorical_crossentropy', wrap_euclidian(mapping = mapping), wrap_tonnetz(mapping = mapping)])
     return model
