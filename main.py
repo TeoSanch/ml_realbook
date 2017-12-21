@@ -6,29 +6,33 @@ Created on Wed Nov 29 17:01:29 2017
 """
 
 from encoding import *
-from model import *
+from model_test import *
 from training import *
 from generation import *
 from reduction import *
 import os.path
 import pickle
+import pdb
 
-def main():
+#def main():
+if True:
     ''' User interface to launch training, or generation using a trained model'''
+    #pdb.set_trace()
     c1 = input('Train or generate? [t/g] ')
     if c1 == 't':
         name = input('Name of the training : ')
-        inputs, alphabet, mapping = ParseInput()
+        inputs, alphabet, mapping, tf_mapping = ParseInput()
         preredutype = input('Type of pre-reduction [N/a0/a1/a2/a3]')
         if preredutype != 'N':
-            inputs, alphabet, mapping = ReduSeq(inputs, preredutype)
+            inputs, alphabet, mapping, tf_mapping = ReduSeq(inputs, preredutype)
         sentence_len = int(input('Sentence length = '))
         step = int(input('Step = '))
         sentences, next_chars = GetSentences(inputs, sentence_len, step)
         x, y = Encode(sentences, mapping, next_chars)
+        #%%
         batch_size = int(input('Batch size = '))
         nb_epoch = int(input('Number of epochs = '))
-        model = GetModel(batch_size, sentence_len, len(alphabet))
+        model = GetModel(batch_size, sentence_len, len(alphabet),tf_mapping)
         history = RefinedTrain(model, x, y, batch_size, nb_epoch)
         pickle.dump(history, open('%s_history.p' %name, "wb"))
         SaveModel(model, name,'./Models/')

@@ -6,6 +6,7 @@ Created on Sun Nov 26 00:20:51 2017
 @author: teo
 """
 import numpy as np
+import tensorflow as tf
 from tkinter import Tk
 from tkinter import filedialog
 
@@ -25,7 +26,9 @@ def ParseInput():
     indices_char = dict((i, c) for i, c in enumerate(chars))
     alphabet_len = len(char_indices)
     print('Alphabet size : ', alphabet_len)
-    return chord_seq, chars, (char_indices, indices_char)
+    tf_chars = tf.constant(list(chars))
+    tf_mapping = tf.contrib.lookup.index_to_string_table_from_tensor(tf_chars, default_value = 'N')
+    return chord_seq, chars, (char_indices, indices_char), tf_mapping
 
 
 def GetSentences(inputs, sentence_len, step):
@@ -44,8 +47,8 @@ def Encode(sentences, mapping, next_chars = None):
         nb_sentences = len(sentences)
         alphabet_len = len(mapping[0])
         sentence_len = len(sentences[0])
-        x = np.zeros((nb_sentences, sentence_len, alphabet_len), dtype=np.bool)
-        y = np.zeros((nb_sentences, alphabet_len), dtype=np.bool)
+        x = np.zeros((nb_sentences, sentence_len, alphabet_len), dtype=np.float32)
+        y = np.zeros((nb_sentences, alphabet_len), dtype=np.float32)
         for i, sentence in enumerate(sentences):
             for t, char in enumerate(sentence[:]):
                 x[i, t, mapping[0][char]] = 1

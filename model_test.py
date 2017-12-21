@@ -23,5 +23,7 @@ def GetModel(statelen, sentence_len, numchars, tf_mapping):
     model.add(Dense(numchars))
     model.add(Activation('softmax'))
     
-    model.compile(loss=caca, optimizer='sgd')#, metrics = ['accuracy', 'categorical_crossentropy']) #[wrap_tonnetz(tf_mapping = tf_mapping, alpha_len=numchars)]
+    model.compile(loss=caca, optimizer='adam', metrics = ['accuracy', 'categorical_crossentropy'])
+    #model.compile(loss=[wrap_tonnetz(tf_mapping = tf_mapping)], optimizer='adam', metrics = ['accuracy', 'categorical_crossentropy'])
+
     return model

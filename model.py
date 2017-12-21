@@ -22,5 +22,5 @@ def GetModel(statelen, sentence_len, numchars):
     model.add(Dense(numchars))
     model.add(Activation('softmax'))
     
-    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics = ['accuracy'])
+    model.compile(loss='mean_squared_error', optimizer='adam', metrics = ['accuracy'])
     return model
