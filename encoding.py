@@ -13,9 +13,11 @@ from tkinter import filedialog
 
 def ParseInput():
     """ Parse the input text file ( in the ./Inputs directory) into a python list and build the alphabet and the mapping (indices to chords and chords to indices)"""
+    
     print('Choose an text input file')
     Tk().withdraw() # we don't want a full GUI, so keep the root window from appearing
     filename = filedialog.askopenfilename(initialdir = './Inputs/',filetypes = (("Template files", "*.txt"), ("All files", "*")))
+    
     print('Database : ' + filename)
     print('Parsing input file...')
     fd = open(filename).read()
@@ -26,9 +28,9 @@ def ParseInput():
     indices_char = dict((i, c) for i, c in enumerate(chars))
     alphabet_len = len(char_indices)
     print('Alphabet size : ', alphabet_len)
-    tf_chars = tf.constant(list(chars))
-    tf_mapping = tf.contrib.lookup.index_to_string_table_from_tensor(tf_chars, default_value = 'N')
-    return chord_seq, chars, (char_indices, indices_char), tf_mapping
+    #tf_chars = tf.constant(list(chars))
+    #tf_mapping = tf.contrib.lookup.index_to_string_table_from_tensor(tf_chars, default_value = 'N')
+    return chord_seq, chars, (char_indices, indices_char)
 
 
 def GetSentences(inputs, sentence_len, step):

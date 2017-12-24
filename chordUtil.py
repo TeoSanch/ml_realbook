@@ -88,11 +88,13 @@ a0 = {
     'dim':     'N',
     'sus4':    'N',
     'sus2':    'N',
+    'sus':     'N',
     '7':       'maj',
     'maj7':    'maj',
     'min7':    'min',
     'minmaj7': 'min',
     'maj6':    'maj',
+    '6':       'maj',
     'min6':    'min',
     'dim7':    'N',
     'hdim7':   'N',
@@ -182,8 +184,8 @@ a3 = {
     'min':     'min',
     'aug':     'aug',
     'dim':     'dim',
-    'sus4':    'sus',
-    'sus2':    'sus',
+    'sus4':    'sus4',
+    'sus2':    'sus4',
     '7':       '7',
     'maj7':    'maj7',
     'min7':    'min7',
@@ -238,12 +240,14 @@ gamme = {
 
 def reduChord(initChord, alpha= 'a1'):
 
-    if initChord == "":
-        print("buuug")
+    #if initChord == "":
+        #print("buuug")
     initChord, bass = initChord.split("/") if "/" in initChord else (initChord, "")
     root, qual = initChord.split(":") if ":" in initChord else (initChord, "")
     root, noChord = root.split("(") if "(" in root else (root, "")
     qual, bass = qual.split("(") if "(" in qual else (qual, "")
+    if "(" in qual:
+        qual = ""
 
 #### modifié par Octave
     root = root.lower()
@@ -269,6 +273,8 @@ def reduChord(initChord, alpha= 'a1'):
                 qual = a2[qual]
         elif alpha == 'a3':
                 qual = a3[qual]
+        elif alpha == 'N':
+            qual = qual
         else:
                 print("wrong alphabet value")
         if qual == "N":

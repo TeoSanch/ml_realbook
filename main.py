@@ -13,18 +13,22 @@ from reduction import *
 import os.path
 import pickle
 import pdb
+from chord_distance_octave import *
 
 #def main():
 if True:
     ''' User interface to launch training, or generation using a trained model'''
-    #pdb.set_trace()
     c1 = input('Train or generate? [t/g] ')
     if c1 == 't':
         name = input('Name of the training : ')
-        inputs, alphabet, mapping, tf_mapping = ParseInput()
+        inputs, alphabet, mapping = ParseInput()
         preredutype = input('Type of pre-reduction [N/a0/a1/a2/a3]')
         if preredutype != 'N':
-            inputs, alphabet, mapping, tf_mapping = ReduSeq(inputs, preredutype)
+            inputs, alphabet, mapping = ReduSeq(inputs, preredutype)
+        tf_mapping = load_tonnetz_matrix(preredutype)
+        ### Tonnetz distance matrix
+        #tonnetz_matrix = 
+        ###
         sentence_len = int(input('Sentence length = '))
         step = int(input('Step = '))
         sentences, next_chars = GetSentences(inputs, sentence_len, step)
@@ -37,12 +41,13 @@ if True:
         pickle.dump(history, open('%s_history.p' %name, "wb"))
         SaveModel(model, name,'./Models/')
     elif c1 == 'g':
-        model = LoadModel()
-        sentence_len = model.get_config()[0]['config']['batch_input_shape'][1]
         inputs, alphabet, mapping = ParseInput()
         preredutype = input('Pre-reduction? [a1/a2/a3/N]')
         if preredutype != 'N':
             inputs, alphabet, mapping = ReduSeq(inputs, preredutype)
+        tf_mapping = load_tonnetz_matrix(preredutype)
+        model = LoadModel(tf_mapping)
+        sentence_len = model.get_config()[0]['config']['batch_input_shape'][1]
         loop = True
         while loop:
             name = input('Name of the generated file : ')

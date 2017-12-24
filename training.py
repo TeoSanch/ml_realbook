@@ -9,6 +9,7 @@ from tkinter import filedialog
 import time
 from keras.models import load_model
 import matplotlib.pyplot as plt
+from wrapper import *
 
 
 def SaveModel(model, name, pathmodel='./Models/'):
@@ -23,12 +24,12 @@ def SaveModel(model, name, pathmodel='./Models/'):
     print('Model savec in '+ filepath)
     return model
     
-def LoadModel():
+def LoadModel(tf_mapping):
     ''' Load choosen model in the ./Models directory'''
     print('Load model...')
     Tk().withdraw()
     filename = filedialog.askopenfilename(initialdir = './Models/', filetypes = (("Template files", "*.h5"), ("All files", "*")))
-    model = load_model(filename)
+    model = load_model(filename, custom_objects={'tonnetz':wrap_tonnetz(tf_mapping=tf_mapping)})
     print(filename + ' loaded')
     return model
     

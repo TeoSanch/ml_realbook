@@ -8,6 +8,7 @@ Created on Sun Nov 26 01:14:26 2017
 
 import random
 from encoding import *
+import pdb
 from reduction import *
 
 def GenerateSentence(model, inputs, seed, nb_iteration, temperature, sentence_len, mapping, determinism = True, redu = 'N'):

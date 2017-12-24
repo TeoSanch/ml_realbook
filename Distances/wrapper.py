@@ -46,7 +46,7 @@ def tensor2chord(y, tf_mapping):
 #    return euclidian  
 
 def caca(y_true,y_pred):
-    return K.categorical_crossentropy(y_true,y_pred)
+    return K.mean(K.square(y_true-y_pred), axis = -1)
 
 def wrap_tonnetz(tf_mapping, alpha_len):  
     def tonnetz(y_true, y_pred):
