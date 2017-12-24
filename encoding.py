@@ -6,17 +6,24 @@ Created on Sun Nov 26 00:20:51 2017
 @author: teo
 """
 import numpy as np
-import tensorflow as tf
 from tkinter import Tk
 from tkinter import filedialog
 
 
 def ParseInput():
-    """ Parse the input text file ( in the ./Inputs directory) into a python list and build the alphabet and the mapping (indices to chords and chords to indices)"""
+    """ 
+    Parse the input text file ( in the ./Inputs directory) into a python 
+    list and build the alphabet and the mapping (indices to chords and chords 
+    to indices)
+    """
     
+    #User interface to select the file
     print('Choose an text input file')
-    Tk().withdraw() # we don't want a full GUI, so keep the root window from appearing
-    filename = filedialog.askopenfilename(initialdir = './Inputs/',filetypes = (("Template files", "*.txt"), ("All files", "*")))
+    Tk().withdraw() 
+    filename = filedialog.askopenfilename(
+            initialdir = './Inputs/',
+            filetypes = (("Template files", "*.txt"), ("All files", "*"))
+            )
     
     print('Database : ' + filename)
     print('Parsing input file...')
@@ -24,7 +31,7 @@ def ParseInput():
     chord_seq = fd.split(' ')
     print('Corpus length:', len(chord_seq))
     chars = set(chord_seq)
-    char_indices = dict((c, i) for i, c in enumerate(chars))    #Mapping : une numéro par mot
+    char_indices = dict((c, i) for i, c in enumerate(chars))
     indices_char = dict((i, c) for i, c in enumerate(chars))
     alphabet_len = len(char_indices)
     print('Alphabet size : ', alphabet_len)

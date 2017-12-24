@@ -14,6 +14,7 @@ import os.path
 import pickle
 import pdb
 from chord_distance_octave import *
+from distance_tonnetz_alexis import * 
 
 #def main():
 if True:
@@ -25,10 +26,10 @@ if True:
         preredutype = input('Type of pre-reduction [N/a0/a1/a2/a3]')
         if preredutype != 'N':
             inputs, alphabet, mapping = ReduSeq(inputs, preredutype)
-        tf_mapping = load_tonnetz_matrix(preredutype)
         ### Tonnetz distance matrix
         #tonnetz_matrix = 
         ###
+        #%%
         sentence_len = int(input('Sentence length = '))
         step = int(input('Step = '))
         sentences, next_chars = GetSentences(inputs, sentence_len, step)
@@ -36,7 +37,18 @@ if True:
         #%%
         batch_size = int(input('Batch size = '))
         nb_epoch = int(input('Number of epochs = '))
-        model = GetModel(batch_size, sentence_len, len(alphabet),tf_mapping)
+        loss_number = int(input('Loss function:\n categorical crossentropy: 1\n euclidian: 2\n tonnetz: 3\n'))
+        if loss_number == 1:
+            loss = 'categorical_crossentropy'
+            tf_mapping = 0
+        elif loss_number == 2:
+            loss = 'euclidian'
+            tf_mapping = load_euclid_matrix(preredutype)
+        elif loss_number == 3:
+            loss = 'tonnetz'
+            tf_mapping = load_tonnetz_matrix(preredutype)
+            
+        model = GetModel(batch_size, sentence_len, len(alphabet),tf_mapping,loss)
         history = RefinedTrain(model, x, y, batch_size, nb_epoch)
         pickle.dump(history, open('%s_history.p' %name, "wb"))
         SaveModel(model, name,'./Models/')

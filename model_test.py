@@ -12,7 +12,7 @@ from keras.layers.recurrent import LSTM
 from wrapper import *
 import tensorflow as tf
 
-def GetModel(statelen, sentence_len, numchars, tf_mapping):
+def GetModel(statelen, sentence_len, numchars, tf_mapping, loss = 'categorical_crossentropy'):
     ''' Generate the LSTM Keras Model described in the K. Choi work'''
     print('Build model...')
     model = Sequential()
@@ -24,6 +24,13 @@ def GetModel(statelen, sentence_len, numchars, tf_mapping):
     model.add(Activation('softmax'))
     
     #model.compile(loss=caca, optimizer='adam', metrics = ['accuracy', 'categorical_crossentropy'])
-    model.compile(loss=[wrap_tonnetz(tf_mapping = tf_mapping)], optimizer='adam', metrics = ['accuracy', 'categorical_crossentropy'])
+    if loss == 'categorical_crossentropy':
+        model.compile(loss='categorical_crossentropy', optimizer='adam', metrics = ['accuracy'])
+    elif loss == 'tonnetz':
+        model.compile(loss=[wrap_tonnetz(tf_mapping = tf_mapping)], optimizer='adam', metrics = ['accuracy', 'categorical_crossentropy'])
+    elif loss == 'euclidian':
+        model.compile(loss=[wrap_tonnetz(tf_mapping = tf_mapping)], optimizer='adam', metrics = ['accuracy', 'categorical_crossentropy'])
+    else:
+        raise ValueError('Cost function named '+loss+' not defined')
 
     return model

@@ -223,44 +223,46 @@ def save_tonnetz_matrix():
     inputs, alphabet, mapping = ParseInput()
     inputs0, alphabet, mapping0 = ReduSeq(inputs, 'a0')
     matrix = tonnetz_matrix(mapping0)
-    pickle.dump(matrix, open('Distances/matrix0.p','wb'))
+    pickle.dump(matrix, open('Distances/matrix_tonnetz_0.p','wb'))
 
     inputs1, alphabet, mapping1 = ReduSeq(inputs, 'a1')
     matrix = tonnetz_matrix(mapping1)
-    pickle.dump(matrix, open('Distances/matrix1.p','wb'))
+    pickle.dump(matrix, open('Distances/matrix_tonnetz_1.p','wb'))
     
     inputs2, alphabet, mapping2 = ReduSeq(inputs, 'a2')
     matrix = tonnetz_matrix(mapping2)
-    pickle.dump(matrix, open('Distances/matrix2.p','wb'))
+    pickle.dump(matrix, open('Distances/matrix_tonnetz_2.p','wb'))
     
     
     inputs3, alphabet, mapping3 = ReduSeq(inputs, 'a3')
     matrix = tonnetz_matrix(mapping3)
-    pickle.dump(matrix, open('Distancees/matrix3.p','wb'))
+    pickle.dump(matrix, open('Distancees/matrix_tonnetz_3.p','wb'))
         
     inputsN, alphabet, mappingN = ReduSeq(inputs, 'N')
     matrix = tonnetz_matrix(mappingN)
-    pickle.dump(matrix, open('matrix4.p','wb'))
+    pickle.dump(matrix, open('matrix_tonnetz_N.p','wb'))
 
 def load_tonnetz_matrix(reduction_type):
     if reduction_type == 'N':
-        matrix = pickle.load(open('Distances/matrixN.p','rb'))
+        matrix = pickle.load(open('Distances/matrix_tonnetz_N.p','rb'))
         matrix.pop(0)
         tensor_matrix = K.constant(matrix)
     elif reduction_type == 'a3':
-        matrix = pickle.load(open('Distances/matrix3.p','rb'))
+        matrix = pickle.load(open('Distances/matrix_tonnetz_3.p','rb'))
         matrix.pop(0)
         tensor_matrix = K.constant(matrix)
     elif reduction_type == 'a2':
-        matrix = pickle.load(open('Distances/matrix2.p','rb'))
+        matrix = pickle.load(open('Distances/matrix_tonnetz_2.p','rb'))
         matrix.pop(0)
         tensor_matrix = K.constant(matrix)        
     elif reduction_type == 'a1':
-        matrix = pickle.load(open('Distances/matrix1.p','rb'))
+        matrix = pickle.load(open('Distances/matrix_tonnetz_1.p','rb'))
         matrix.pop(0)
         tensor_matrix = K.constant(matrix)        
     elif reduction_type == 'a0':
-        matrix = pickle.load(open('Distances/matrix0.p','rb'))
+        matrix = pickle.load(open('Distances/matrix_tonnetz_0.p','rb'))
         matrix.pop(0)
         tensor_matrix = K.constant(matrix)    
     return tensor_matrix
+
+#%%

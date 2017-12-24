@@ -30,9 +30,12 @@ chordtype_to_rel_tone_vec["min7"] = [1,2.5,5,6.5]
 chordtype_to_rel_tone_vec["7"] = [1,3,5,6.5]
 chordtype_to_rel_tone_vec["dim7"] = [1,2.5,4.5,6]
 chordtype_to_rel_tone_vec["hdim7"] = [1,2.5,4.5,6.5]
+chordtype_to_rel_tone_vec["hdim"] = [1,2.5,4.5,6.5]
 chordtype_to_rel_tone_vec["minmaj7"] = [1,2.5,5,7]
 #Six chords
 chordtype_to_rel_tone_vec["maj6"] = [1,3,5,6]
+chordtype_to_rel_tone_vec["6"] = [1,3,5,6]
+
 chordtype_to_rel_tone_vec["min6"] = [1,2.5,5,6]
 #Extended chords
 chordtype_to_rel_tone_vec["9"] = [1,3,5,6.5,9]
