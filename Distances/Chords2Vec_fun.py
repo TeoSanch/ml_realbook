@@ -145,10 +145,10 @@ def list_mir_label_to_list_vec(list_label,
     list_vec = []
     for l in list_label:
         if mode == 'bin_chroma' or mode is None:
-    			list_vec.append(mir_label_to_bin_chroma_vec(l, chroma_mode))
-		  elif mode == 'semitones':
-			   list_vec.append(mir_label_to_semitones_vec(l))
-	 return list_vec
+            list_vec.append(mir_label_to_bin_chroma_vec(l, chroma_mode))
+        elif mode == 'semitones':
+            list_vec.append(mir_label_to_semitones_vec(l))
+    return list_vec
 
 
 def mir_labels_file_to_list_vec(in_file_path, 

@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
+'''
 Created on Sun Nov 26 00:20:51 2017
 
 @author: teo
-"""
+'''
 import numpy as np
 from tkinter import Tk
 from tkinter import filedialog
 
 
 def ParseInput():
-    """ 
+    ''' 
     Parse the input text file ( in the ./Inputs directory) into a python 
     list and build the alphabet and the mapping (indices to chords and chords 
     to indices)
-    """
+    '''
     
     #User interface to select the file
     
@@ -23,7 +23,7 @@ def ParseInput():
     Tk().withdraw() 
     filename = filedialog.askopenfilename(
             initialdir = './Inputs/',
-            filetypes = (("Template files", "*.txt"), ("All files", "*"))
+            filetypes = (('Template files', '*.txt'), ('All files', '*'))
             )
     print('Database : ' + filename)
     print('Parsing input file...')

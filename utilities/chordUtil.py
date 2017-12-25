@@ -9,7 +9,6 @@ Created on Tue Nov 21 12:38:02 2017
 """----------------------------------------------------------------------
 -- Tristan Metadata and conv
 ----------------------------------------------------------------------"""
-#%%
 
 QUALITIES = {
     #           1     2     3     4  5     6     7
@@ -51,11 +50,13 @@ a0 = {
     'dim':     'N',
     'sus4':    'N',
     'sus2':    'N',
+    'sus':     'N',
     '7':       'maj',
     'maj7':    'maj',
     'min7':    'min',
     'minmaj7': 'min',
     'maj6':    'maj',
+    '6':       'maj',
     'min6':    'min',
     'dim7':    'N',
     'hdim7':   'N',
@@ -74,7 +75,9 @@ a0 = {
     'b13':     'maj',
     '1':       'N',
     '5':       'N',
-    '': 'N'}
+    'n':       'N',
+    'N':       'N',
+    '':        'N'}
 
 a1 = {
     'maj':     'maj',
@@ -88,6 +91,7 @@ a1 = {
     'min7':    'min',
     'minmaj7': 'min',
     'maj6':    'maj',
+    '6':       'maj',
     'min6':    'min',
     'dim7':    'dim',
     'hdim7':   'dim',
@@ -115,12 +119,12 @@ a2 = {
     'dim':     'dim',
     'sus4':    'N',
     'sus2':    'N',
-    'sus' : 'maj',
     '7':       '7',
     'maj7':    'maj7',
     'min7':    'min7',
     'minmaj7': 'min',
     'maj6':    'maj',
+    '6':       'maj',
     'min6':    'min',
     'dim7':    'dim7',
     'hdim7':   'dim',
@@ -148,12 +152,12 @@ a3 = {
     'dim':     'dim',
     'sus4':    'sus4',
     'sus2':    'sus4',
-    'sus':     'sus4',
     '7':       '7',
     'maj7':    'maj7',
     'min7':    'min7',
     'minmaj7': 'min',
     'maj6':    'maj',
+    '6':       'maj',
     'min6':    'min',
     'dim7':    'dim7',
     'hdim7':   'dim',
@@ -175,38 +179,36 @@ a3 = {
     '': 'N'}
 
 gamme = {
-    'Ab':   'G#',
-    'A':    'A',
-    'A#':   'A#',
-    'Bb':   'A#',
-    'B':    'B',
-    'Cb':   'B',
-    'C':    'C',
-    'C#':   'C#',
-    'Db':   'C#',
-    'D':    'D',
-    'D#':   'D#',
-    'Eb':   'D#',
-    'E':    'E',
-    'E#':   'E#',
-    'Fb':   'E#',
-    'F':    'F',
-    'F#':   'F#',
-    'Gb':   'F#',
-    'G':    'G',
-    'G#':   'G#',
-    'N' :   'N',
-    '' :    'N'}
+### modifié par Octave
+    'ab':   'g#',
+    'a':    'a',
+    'a#':   'a#',
+    'bb':   'a#',
+    'b':    'b',
+    'cb':   'b',
+    'c':    'c',
+    'c#':   'c#',
+    'db':   'd#',
+    'd':    'd',
+    'd#':   'd#',
+    'eb':   'd#',
+    'e':    'e',
+    'e#':   'e#',
+    'fb':   'e#',
+    'f':    'f',
+    'f#':   'f#',
+    'gb':   'f#',
+    'g':    'g',
+    'g#':   'g#',
+    'n' :   'n',
+    '' :    'n'
+###
+    }
 
-def ReduChord(initChord, alpha= 'a1'):
-    def QualException(qual):
-        if qual == '6':
-            return 'maj6'
-        else:
-            return qual
-        
-    if initChord == "":
-        print("buuug")
+def reduChord(initChord, alpha= 'a1'):
+
+    #if initChord == "":
+        #print("buuug")
     if 'START' in initChord.upper():
         return 'Start'
     elif 'END' in initChord.upper():
@@ -215,21 +217,24 @@ def ReduChord(initChord, alpha= 'a1'):
     root, qual = initChord.split(":") if ":" in initChord else (initChord, "")
     root, noChord = root.split("(") if "(" in root else (root, "")
     qual, bass = qual.split("(") if "(" in qual else (qual, "")
-      
-    
+    if "(" in qual:
+        qual = ""
+
+#### modifié par Octave
+    root = root.lower()
+###
+
     root = gamme[root]
-    qual = QualException(qual)
-    
-    
+
     if qual == "":
         if root == "N" or noChord != "":
             finalChord = "N"
         else:
             finalChord = root + ':maj'
-    
+
     elif root == "N":
         finalChord = "N"
-    
+
     else:
         if alpha == 'a1':
                 qual = a1[qual]
@@ -239,6 +244,8 @@ def ReduChord(initChord, alpha= 'a1'):
                 qual = a2[qual]
         elif alpha == 'a3':
                 qual = a3[qual]
+        elif alpha == 'N':
+            qual = qual
         else:
                 print("wrong alphabet value")
         if qual == "N":
@@ -250,7 +257,7 @@ def ReduChord(initChord, alpha= 'a1'):
 
 def ReduSeq(inputs, alpha = 'a1'):
     print('Process reduction ' + alpha + ' ...')
-    new_inputs = list(map(lambda x: ReduChord(x, alpha), inputs))
+    new_inputs = list(map(lambda x: reduChord(x, alpha), inputs))
     new_chars = set(new_inputs)
     char_indices = dict((c, i) for i, c in enumerate(new_chars))    #Mapping : une numéro par mot
     indices_char = dict((i, c) for i, c in enumerate(new_chars))

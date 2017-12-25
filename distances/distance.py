@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-
-"""
+'''
 Created on Tue Dec 12 21:02:30 2017
 
 @author: octav
-"""
+'''
 
-"""
+'''
 The function distance_tonnetz returns a distance measurement based on the
 number of trasnformations in the tonnetz space necessary to go from one chord
 to another. It can only perform this result for major and minor chords.
-"""
+'''
 
-import Chords2Vec_fun as C2V
-import chordUtil as utils
+#import Chords2Vec_fun as C2V
+#import chordUtil as utils
+import utilities
 import pickle
 import keras.backend as K
 import numpy as np
@@ -69,11 +70,12 @@ def distance_tonnetz(Chord1, Chord2):
             costs.append(reduction_cost)
         elif (root_1==root_2
               and ((type_2 == 'n' or type_1 == 'n')
-                  or (type_2=='' or type_1==''))
+                  or (type_2=='' or type_1=='')
+                  )
               ):
                 matching_suite.append('')
-                costs.append(reduction_cost+noneType_cost)
-        elif root_1 in ['N','n',' ',''] or root_2 in ['N','n',' ','']:
+                costs.append(reduction_cost + noneType_cost)
+        elif root_1 in ['N', 'n', ' ', ''] or root_2 in ['N', 'n', ' ', '']:
             matching_suite.append('')
             costs.append(noneRoot_cost)
 
@@ -82,40 +84,41 @@ def distance_tonnetz(Chord1, Chord2):
         #smallest distance between a major or minor chord for the replacing
         #type, added to the noneType_cost
 
-        elif (type_1 == 'n' or type_1=='') and (type_2 == 'n' or type_2 == ''):
+        elif ((type_1 == 'n' or type_1 == '') 
+        and (type_2 == 'n' or type_2 == '')):
             costs.append(
-                        distance_tonnetz(root_1 + ':maj', root_2 + ':maj')
-                        + noneType_cost
+                    distance_tonnetz(root_1+':maj', root_2+':maj')
+                    + noneType_cost
                          )
             costs.append(
-                        distance_tonnetz(root_1 + ':maj', root_2 + ':min')
-                        + noneType_cost
+                    distance_tonnetz(root_1+':maj', root_2+':min')
+                    + noneType_cost
                          )
             costs.append(
-                        distance_tonnetz(root_1 + ':min', root_2 + ':maj')
-                        + noneType_cost
+                    distance_tonnetz(root_1+':min', root_2+':maj')
+                    + noneType_cost
                          )
             costs.append(
-                        distance_tonnetz(root_1 + ':min', root_2 + ':min')
-                        + noneType_cost
+                    distance_tonnetz(root_1+':min', root_2+':min')
+                    + noneType_cost
                         )
-        elif type_1=='n' or type_1 == 'n':
+        elif type_1 == 'n' or type_1 == 'n':
             costs.append(
-                        distance_tonnetz(root_1 + ':maj', root_2 + ':' + type_2)
-                        + noneType_cost
+                    distance_tonnetz(root_1+':maj', root_2+':'+type_2)
+                    + noneType_cost
                         )
             costs.append(
-                        distance_tonnetz(root_1 + ':min', root_2 + ':' + type_2)
-                        + noneType_cost
+                    distance_tonnetz(root_1+':min', root_2+':'+type_2)
+                    + noneType_cost
                         )
         elif type_2 == 'n' or type_2 == '':
             costs.append(
-                        distance_tonnetz(root_1 + ':' + type_1, root_2 + ':maj')
-                        + noneType_cost
+                    distance_tonnetz(root_1+':'+type_1, root_2+':maj')
+                    + noneType_cost
                         )
             costs.append(
-                        distance_tonnetz(root_1 + ':' + type_1, root_2 + ':min')
-                        + noneType_cost
+                    distance_tonnetz(root_1+':'+type_1, root_2+':min')
+                    + noneType_cost
                         )
 
         #perform the tonnetz_distance for major and minor chords
@@ -151,8 +154,8 @@ def distance_tonnetz(Chord1, Chord2):
                 if root_transform == root_1 and type_transform == type_1:
                     matching_suite.append(list(suite))
                     costs.append(
-                                int(cost_count(suite, L_cost, R_cost, P_cost))
-                                + reduction_cost
+                            int(cost_count(suite, L_cost, R_cost, P_cost))
+                            + reduction_cost
                                 )
 
                 #change the suite
@@ -183,11 +186,11 @@ def distance_tonnetz(Chord1, Chord2):
 #Perfom a  L-transform to the given chord
 def L_transform(chord_root,chord_type):
     if chord_type == 'maj':
-        n = (root_list.index(chord_root) + 4) % 12
+        n = (root_list.index(chord_root)+4) % 12
         chord_root = root_list[n]
         chord_type = 'min'
     elif chord_type == 'min':
-        n = (root_list.index(chord_root) - 4) % 12
+        n = (root_list.index(chord_root)-4) % 12
         chord_root = root_list[n]
         chord_type = 'maj'
     return chord_root, chord_type
@@ -195,11 +198,11 @@ def L_transform(chord_root,chord_type):
 #Perform a R-transform to the given chord
 def R_transform(chord_root, chord_type):
     if chord_type == 'maj':
-        n = (root_list.index(chord_root) - 3) % 12
+        n = (root_list.index(chord_root)-3) % 12
         chord_root = root_list[n]
         chord_type = 'min'
     elif chord_type == 'min':
-        n = (root_list.index(chord_root) + 3) % 12
+        n = (root_list.index(chord_root)+3) % 12
         chord_root = root_list[n]
         chord_type = 'maj'
     return chord_root, chord_type
@@ -259,25 +262,25 @@ def tonnetz_matrix(mapping):
 #%%
 
 def save_tonnetz_matrix():
-    inputs, alphabet, mapping = ParseInput()
-    inputs0, alphabet, mapping0 = ReduSeq(inputs, 'a0')
+    inputs, alphabet, mapping = encoding.ParseInput()
+    inputs0, alphabet, mapping0 = utils.reduSeq(inputs, 'a0')
     matrix = tonnetz_matrix(mapping0)
     pickle.dump(matrix, open('Distances/matrix_tonnetz_0.p', 'wb'))
 
-    inputs1, alphabet, mapping1 = ReduSeq(inputs, 'a1')
+    inputs1, alphabet, mapping1 = utils.reduSeq(inputs, 'a1')
     matrix = tonnetz_matrix(mapping1)
     pickle.dump(matrix, open('Distances/matrix_tonnetz_1.p', 'wb'))
 
-    inputs2, alphabet, mapping2 = ReduSeq(inputs, 'a2')
+    inputs2, alphabet, mapping2 = utils.reduSeq(inputs, 'a2')
     matrix = tonnetz_matrix(mapping2)
     pickle.dump(matrix, open('Distances/matrix_tonnetz_2.p', 'wb'))
 
 
-    inputs3, alphabet, mapping3 = ReduSeq(inputs, 'a3')
+    inputs3, alphabet, mapping3 = utils.reduSeq(inputs, 'a3')
     matrix = tonnetz_matrix(mapping3)
     pickle.dump(matrix, open('Distancees/matrix_tonnetz_3.p', 'wb'))
 
-    inputsN, alphabet, mappingN = ReduSeq(inputs, 'N')
+    inputsN, alphabet, mappingN = utils.reduSeq(inputs, 'N')
     matrix = tonnetz_matrix(mappingN)
     pickle.dump(matrix, open('matrix_tonnetz_N.p', 'wb'))
 
@@ -305,3 +308,134 @@ def load_tonnetz_matrix(reduction_type):
     return tensor_matrix
 
 #%%
+    
+#%%
+#dist=0 pour une distance en terme de euclid en note, =1 pour une distance euclidean
+# Necessite une réduction avant comparaison car ne peux lire uniquement les accord de type maj/min/dim/aug/maj7/min7/7/dim7/hdim7/minmaj7/maj6/min6/9/maj9/min9/sus2/sus4
+def distance_euclid(A_1,
+                    A_2):
+    
+    #initialisaition
+    A_1_red = utils.reduChord(A_1, 'N')
+    A_2_red = utils.reduChord(A_2, 'N')
+    
+    Accord_1_eucl = C2V.mir_label_to_semitones_vec(A_1_red)
+    Accord_2_eucl = C2V.mir_label_to_semitones_vec(A_2_red)
+    N_1 = len(Accord_1_eucl)
+    N_2 = len(Accord_2_eucl)
+    distance_all = np.zeros(N_1, N_2)
+    distance_ligne = np.zeros(N_1)
+    distance_eucl = 0
+    
+    #Dictionnaire regroupant les distances euclédienne pour des distances >=7 demis tons
+    D= { 11 : 1,
+        10 : 2,
+        9 : 3 ,
+        8 : 4,
+        7 : 5}
+    
+    for k in range(0, N_1):
+        for l in range(0, N_2):
+            d = Accord_1_eucl[k] - Accord_2_eucl[l]
+            
+            #lorsque l'intervalle est inférieur à 6 demis tons
+            if abs(d) <= 6:
+                distance_all[k][l] = np.pow(d, 2)
+            
+            #lorsque l'intervalle est supérieur à 6 demis tons on se sert du dictionnaire D
+            if abs(d) > 6:
+                distance_all[k][l] = np.pow(D[abs(d)], 2)
+          
+        #on concerve uniquement les distances minimum pour la note k_eme de l'accord 1
+        distance_ligne[k] = min(distance_all[k])
+        
+        #on somme toute les distances minimum            
+        distance_eucl += distance_ligne[k]
+    
+    
+    distance_eucl = np.sqrt(distance_eucl)
+    
+    #on renvoi la distance normalisé pour le pire cas
+    
+    return distance_eucl / np.sqrt(4*11)
+
+
+#%%
+
+def euclid_matrix(mapping):
+    dict_alphabet = mapping[1]
+    key, alphabet = zip(*dict_alphabet.items())
+    key = list(key)
+    alphabet = list(alphabet)
+    
+    cost_start_end = 1
+    
+    matrix  = [[]]
+    
+    for i in key:
+        print(i)
+        matrix_line = []
+        for j in key:
+            if (alphabet[i] in ['_START_','_END_','Start','End'] 
+            or alphabet[j] in ['_START_','_END_','Start','End']):
+                if alphabet[i] == alphabet[j]:
+                    matrix_line.append(0)
+                else:
+                    matrix_line.append(cost_start_end)
+            else:
+                cost = distance(alphabet[i], alphabet[j])
+                matrix_line.append(cost)
+            
+            
+        matrix.append(matrix_line)
+        
+    return matrix
+
+#%%
+def save_euclid_matrix():
+    inputs, alphabet, mapping = encoding.ParseInput()
+    inputs0, alphabet, mapping0 = utils.ReduSeq(inputs, 'a0')
+    matrix = euclid_matrix(mapping0)
+    pickle.dump(matrix, open('Distances/matrix_eucl_0.p','wb'))
+
+    inputs1, alphabet, mapping1 = utils.ReduSeq(inputs, 'a1')
+    matrix = euclid_matrix(mapping1)
+    pickle.dump(matrix, open('Distances/matrix_eucl_1.p','wb'))
+    
+    inputs2, alphabet, mapping2 = utils.ReduSeq(inputs, 'a2')
+    matrix = euclid_matrix(mapping2)
+    pickle.dump(matrix, open('Distances/matrix_eucl_2.p','wb'))
+    
+    
+    inputs3, alphabet, mapping3 = utils.ReduSeq(inputs, 'a3')
+    matrix = euclid_matrix(mapping3)
+    pickle.dump(matrix, open('Distances/matrix_eucl_3.p','wb'))
+        
+    matrix = euclid_matrix(mapping)
+    pickle.dump(matrix, open('Distances/matrix_eucl_N.p','wb'))
+
+def load_euclid_matrix(reduction_type):
+    if reduction_type == 'N':
+        matrix = pickle.load(open('Distances/matrix_eucl_N.p','rb'))
+        matrix.pop(0)
+        tensor_matrix = K.constant(matrix)
+    elif reduction_type == 'a3':
+        matrix = pickle.load(open('Distances/matrix_eucl_3.p','rb'))
+        matrix.pop(0)
+        tensor_matrix = K.constant(matrix)
+    elif reduction_type == 'a2':
+        matrix = pickle.load(open('Distances/matrix_eucl_2.p','rb'))
+        matrix.pop(0)
+        tensor_matrix = K.constant(matrix)        
+    elif reduction_type == 'a1':
+        matrix = pickle.load(open('Distances/matrix_eucl_1.p','rb'))
+        matrix.pop(0)
+        tensor_matrix = K.constant(matrix)        
+    elif reduction_type == 'a0':
+        matrix = pickle.load(open('Distances/matrix_eucl_0.p','rb'))
+        matrix.pop(0)
+        tensor_matrix = K.constant(matrix)    
+    return tensor_matrix
+    
+
+
