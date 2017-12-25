@@ -29,7 +29,8 @@ root_list = ['c', 'c#', 'd', 'eb', 'e', 'f', 'f#', 'g', 'g#', 'a', 'bb', 'b']
 Used in each function as base for all chord root
 '''
 #%%
-def distance_tonnetz(Chord1, Chord2):
+def distance_tonnetz(Chord1,
+                     Chord2):
     '''
     The function calculate the distance between two given chords by using
     Neo-Riemmanian Tonnetz transformations
@@ -84,7 +85,6 @@ def distance_tonnetz(Chord1, Chord2):
     suite = ['L']
     costs = []
     matching_suite = []
-
     #if the two chords are the same, the cost is zero
     if root_1 == root_2 and type_1 == type_2:
         costs.append(0)
@@ -108,7 +108,6 @@ def distance_tonnetz(Chord1, Chord2):
         elif root_1 in ['N', 'n', ' ', ''] or root_2 in ['N', 'n', ' ', '']:
             matching_suite.append('')
             costs.append(noneRoot_cost)
-
         #if at least one of the chord is a noneType, perform the
         #distance_tonnetz by replacing its type. The function will return the
         #smallest distance between a major or minor chord for the replacing
@@ -149,7 +148,6 @@ def distance_tonnetz(Chord1, Chord2):
                     distance_tonnetz(root_1+':'+type_1, root_2+':min')
                     + noneType_cost
                         )
-
         #perform the tonnetz_distance for major and minor chords
         else:
             #loop to test all combined suites of 5 tonnetz transformations
@@ -201,7 +199,8 @@ def distance_tonnetz(Chord1, Chord2):
     return cost
 
 #%%
-def L_transform(chord_root, chord_type):
+def L_transform(chord_root,
+                chord_type):
     '''
     The function transform the input chord by a L-transform in the Tonnetz
     space. A minor chord becomes a major chord a major third down and a major
@@ -235,7 +234,8 @@ def L_transform(chord_root, chord_type):
     return chord_root, chord_type
 
 #%%
-def R_transform(chord_root, chord_type):
+def R_transform(chord_root,
+                chord_type):
     '''
     The function transform the input chord by a R-transform in the Tonnetz
     space. A minor chord becomes a major chord a minor third up and a major
@@ -269,7 +269,8 @@ def R_transform(chord_root, chord_type):
     return chord_root, chord_type
 
 #%%
-def P_transform(chord_root, chord_type):
+def P_transform(chord_root,
+                chord_type):
     '''
     The function transform the input chord by a P-transform in the Tonnetz
     space. A minor chord becomes a major chord and a major chord becomes a minor
@@ -298,7 +299,10 @@ def P_transform(chord_root, chord_type):
     return chord_root, chord_type
 
 #%%
-def cost_count(suite, L_cost, R_cost, P_cost):
+def cost_count(suite,
+               L_cost,
+               R_cost,
+               P_cost):
     '''
     The function calculates the cost of a given serie of Tonnetz transformations
     using a specific cost for each transformation by iterating through a list
@@ -332,10 +336,73 @@ def cost_count(suite, L_cost, R_cost, P_cost):
     return cost
 
 #%%
+def distance_euclid(A_1,
+                    A_2):
+    '''
+    Calculates the euclidian distance between two given chords, using the
+    semitone distance between each notes of the two chords.
+
+    Parameters
+    ----------
+    A_1: str
+        The first chord to compare
+    A_2: str
+        The second chord to compare
+
+    Each chord must be written as follow: 'root:type'.
+    Upper or lower case doesn't affect the code.
+    Writing chords root with # or b doesn't affect the code (C# = Db).
+
+    Returns
+    -------
+    cost: float
+        Distance (cost) between A_1 and A_2
+
+    Notes
+    -----
+    The distance rely on the utilities package to create arrays of semitones
+    for each chord. All types of chords will not be supported (see the
+    utilities.C2V.mir_label_to_semitones_vec function for more information).
+    '''
+    #initialisation
+    A_1_red = utilities.utils.reduChord(A_1, 'N')
+    A_2_red = utilities.utils.reduChord(A_2, 'N')
+    Accord_1_eucl = utilities.C2V.mir_label_to_semitones_vec(A_1_red)
+    Accord_2_eucl = utilities.C2V.mir_label_to_semitones_vec(A_2_red)
+    N_1 = len(Accord_1_eucl)
+    N_2 = len(Accord_2_eucl)
+    distance_eucl = 0
+    #Dictionnary giving relative distances for distances >= 7 semitones.
+    D= { 11 : 1,
+        10 : 2,
+        9 : 3 ,
+        8 : 4,
+        7 : 5}
+    #iterate through chord 1 and 2
+    for k in range(0, N_1):
+        distance_all = np.zeros(N_2)
+        for l in range(0, N_2):
+            d = Accord_1_eucl[k] - Accord_2_eucl[l]
+            #Get the distance for a small semitone interval
+            if abs(d) <= 6:
+                distance_all[l] = np.pow(d, 2)
+            #Or use the dictionnary for a larger one
+            if abs(d) > 6:
+                distance_all[l] = np.pow(D[abs(d)], 2)
+        #Keep the minimum distance between a note and all the notes of the other
+        #chord
+        distance_eucl += min(distance_all)
+    distance_eucl = np.sqrt(distance_eucl)
+
+    #Normalize by the worst case
+    cost = distance_eucl / np.sqrt(4*11)
+    return cost
+
+#%%
 def tonnetz_matrix(mapping):
     '''
-    The function ccalculates a matrix representing the costs of all possible
-    pair of chords in a given chord alphabet.
+    The function calculates a matrix representing the tonnetz costs of all
+    possible pair of chords in a given chord alphabet.
 
     Parameters
     ----------
@@ -344,7 +411,7 @@ def tonnetz_matrix(mapping):
         A tuple or list containing on its second part a dictionnary associating
         a number (key) and a chord (value).
 
-    The chords inside the mapping must be formatted like defined in the 
+    The chords inside the mapping must be formatted like defined in the
     distance_tonnetz function.
 
     Returns
@@ -387,120 +454,45 @@ def tonnetz_matrix(mapping):
     return matrix
 
 #%%
-
-def save_tonnetz_matrix():
-    inputs, alphabet, mapping = utilities.encoding.ParseInput()
-    inputs0, alphabet, mapping0 = utilities.utils.reduSeq(inputs, 'a0')
-    matrix = tonnetz_matrix(mapping0)
-    pickle.dump(matrix, open('Distances/matrix_tonnetz_0.p', 'wb'))
-
-    inputs1, alphabet, mapping1 = utilities.utils.reduSeq(inputs, 'a1')
-    matrix = tonnetz_matrix(mapping1)
-    pickle.dump(matrix, open('Distances/matrix_tonnetz_1.p', 'wb'))
-
-    inputs2, alphabet, mapping2 = utilities.utils.reduSeq(inputs, 'a2')
-    matrix = tonnetz_matrix(mapping2)
-    pickle.dump(matrix, open('Distances/matrix_tonnetz_2.p', 'wb'))
-
-
-    inputs3, alphabet, mapping3 = utilities.utils.reduSeq(inputs, 'a3')
-    matrix = tonnetz_matrix(mapping3)
-    pickle.dump(matrix, open('Distancees/matrix_tonnetz_3.p', 'wb'))
-
-    inputsN, alphabet, mappingN = utilities.utils.reduSeq(inputs, 'N')
-    matrix = tonnetz_matrix(mappingN)
-    pickle.dump(matrix, open('matrix_tonnetz_N.p', 'wb'))
-
-def load_tonnetz_matrix(reduction_type):
-    if reduction_type == 'N':
-        matrix = pickle.load(open('Distances/matrix_tonnetz_N.p', 'rb'))
-        matrix.pop(0)
-        tensor_matrix = K.constant(matrix)
-    elif reduction_type == 'a3':
-        matrix = pickle.load(open('Distances/matrix_tonnetz_3.p', 'rb'))
-        matrix.pop(0)
-        tensor_matrix = K.constant(matrix)
-    elif reduction_type == 'a2':
-        matrix = pickle.load(open('Distances/matrix_tonnetz_2.p', 'rb'))
-        matrix.pop(0)
-        tensor_matrix = K.constant(matrix)
-    elif reduction_type == 'a1':
-        matrix = pickle.load(open('Distances/matrix_tonnetz_1.p', 'rb'))
-        matrix.pop(0)
-        tensor_matrix = K.constant(matrix)
-    elif reduction_type == 'a0':
-        matrix = pickle.load(open('Distances/matrix_tonnetz_0.p', 'rb'))
-        matrix.pop(0)
-        tensor_matrix = K.constant(matrix)
-    return tensor_matrix
-
-#%%
-
-#%%
-#dist=0 pour une distance en terme de euclid en note, =1 pour une distance euclidean
-# Necessite une réduction avant comparaison car ne peux lire uniquement les accord de type maj/min/dim/aug/maj7/min7/7/dim7/hdim7/minmaj7/maj6/min6/9/maj9/min9/sus2/sus4
-def distance_euclid(A_1,
-                    A_2):
-
-    #initialisaition
-    A_1_red = utilities.utils.reduChord(A_1, 'N')
-    A_2_red = utilities.utils.reduChord(A_2, 'N')
-
-    Accord_1_eucl = utilities.C2V.mir_label_to_semitones_vec(A_1_red)
-    Accord_2_eucl = utilities.C2V.mir_label_to_semitones_vec(A_2_red)
-    N_1 = len(Accord_1_eucl)
-    N_2 = len(Accord_2_eucl)
-    distance_all = np.zeros(N_1, N_2)
-    distance_ligne = np.zeros(N_1)
-    distance_eucl = 0
-
-    #Dictionnaire regroupant les distances euclédienne pour des distances >=7 demis tons
-    D= { 11 : 1,
-        10 : 2,
-        9 : 3 ,
-        8 : 4,
-        7 : 5}
-
-    for k in range(0, N_1):
-        for l in range(0, N_2):
-            d = Accord_1_eucl[k] - Accord_2_eucl[l]
-
-            #lorsque l'intervalle est inférieur à 6 demis tons
-            if abs(d) <= 6:
-                distance_all[k][l] = np.pow(d, 2)
-
-            #lorsque l'intervalle est supérieur à 6 demis tons on se sert du dictionnaire D
-            if abs(d) > 6:
-                distance_all[k][l] = np.pow(D[abs(d)], 2)
-
-        #on concerve uniquement les distances minimum pour la note k_eme de l'accord 1
-        distance_ligne[k] = min(distance_all[k])
-
-        #on somme toute les distances minimum
-        distance_eucl += distance_ligne[k]
-
-
-    distance_eucl = np.sqrt(distance_eucl)
-
-    #on renvoi la distance normalisé pour le pire cas
-
-    return distance_eucl / np.sqrt(4*11)
-
-
-#%%
-
 def euclid_matrix(mapping):
+    '''
+    The function calculates a matrix representing the euclidian costs of all
+    possible pair of chords in a given chord alphabet.
+
+    Parameters
+    ----------
+    mapping: tuple or list of dict
+            (given by the enconding functions from utilities)
+        A tuple or list containing on its second part a dictionnary associating
+        a number (key) and a chord (value).
+
+    The chords inside the mapping must be formatted like defined in the
+    distance_euclid function.
+
+    Returns
+    -------
+    matrix: list of lists of floats
+        A matrix containing for each item (row i, column j) the euclidian
+        distance of the two chords defined by keys i and j in the initial
+        mapping.
+
+    Notes
+    -----
+    In the Choi RealBook dataset which we are using, there is 'Start' and 'End'
+    elements which bounds a given piece of music. Since we cannot calculate a
+    distance for these elements, we state that the cost between them and
+    any other element will be given by the cost_start_end value.
+    '''
+    #Parse the dictionnary to chords and keys
     dict_alphabet = mapping[1]
     key, alphabet = zip(*dict_alphabet.items())
     key = list(key)
     alphabet = list(alphabet)
-
-    cost_start_end = 1
-
+    #define the cost of start and end statements
+    cost_start_end = 2
     matrix  = [[]]
-
+    #loop over the elements in the dictionnary
     for i in key:
-        print(i)
         matrix_line = []
         for j in key:
             if (alphabet[i] in ['_START_','_END_','Start','End']
@@ -510,54 +502,188 @@ def euclid_matrix(mapping):
                 else:
                     matrix_line.append(cost_start_end)
             else:
-                cost = distance(alphabet[i], alphabet[j])
+                cost = distance_euclid(alphabet[i], alphabet[j])
                 matrix_line.append(cost)
-
 
         matrix.append(matrix_line)
 
     return matrix
 
 #%%
-def save_euclid_matrix():
-    inputs, alphabet, mapping = utilities.encoding.ParseInput()
-    inputs0, alphabet, mapping0 = utilities.utils.ReduSeq(inputs, 'a0')
-    matrix = euclid_matrix(mapping0)
-    pickle.dump(matrix, open('Distances/matrix_eucl_0.p','wb'))
+def save_tonnetz_matrix():
+    '''
+    Saves the matrixes given by the tonnetz_matrix function to .p files for each
+    reduction of a given dataset.
 
+    Parameters
+    ----------
+    Since the dataset is defined by a GUI inside the function, no parameter is
+    required.
+
+    Notes
+    -----
+    The reductions are performed by the function utils.reduSeq in the utilities
+    packages.
+    '''
+    #Define the dataset
+    inputs, alphabet, mapping = utilities.encoding.ParseInput()
+    #Reduction to the 'a0' reduction
+    inputs0, alphabet, mapping0 = utilities.utils.reduSeq(inputs, 'a0')
+    #Calculate the matrix
+    matrix = tonnetz_matrix(mapping0)
+    #Save it through pickle
+    pickle.dump(matrix, open('Distances/matrix_tonnetz_0.p', 'wb'))
+    #Same for 'a1' reduction
+    inputs1, alphabet, mapping1 = utilities.utils.reduSeq(inputs, 'a1')
+    matrix = tonnetz_matrix(mapping1)
+    pickle.dump(matrix, open('Distances/matrix_tonnetz_1.p', 'wb'))
+    #Same for 'a2' reduction
+    inputs2, alphabet, mapping2 = utilities.utils.reduSeq(inputs, 'a2')
+    matrix = tonnetz_matrix(mapping2)
+    pickle.dump(matrix, open('Distances/matrix_tonnetz_2.p', 'wb'))
+    #Same for 'a3' reduction
+    inputs3, alphabet, mapping3 = utilities.utils.reduSeq(inputs, 'a3')
+    matrix = tonnetz_matrix(mapping3)
+    pickle.dump(matrix, open('Distancees/matrix_tonnetz_3.p', 'wb'))
+    #Same for no reduction
+    inputsN, alphabet, mappingN = utilities.utils.reduSeq(inputs, 'N')
+    matrix = tonnetz_matrix(mappingN)
+    pickle.dump(matrix, open('matrix_tonnetz_N.p', 'wb'))
+
+#%%
+def save_euclid_matrix():
+    '''
+    Saves the matrixes given by the euclid_matrix function to .p files for each
+    reduction of a given dataset.
+
+    Parameters
+    ----------
+    Since the dataset is defined by a GUI inside the function, no parameter is
+    required.
+
+    Notes
+    -----
+    The reductions are performed by the function utils.reduSeq in the utilities
+    packages.
+    '''
+    #Define the dataset
+    inputs, alphabet, mapping = utilities.encoding.ParseInput()
+    #Apply reduction 'a0'
+    inputs0, alphabet, mapping0 = utilities.utils.ReduSeq(inputs, 'a0')
+    #Create the matrix
+    matrix = euclid_matrix(mapping0)
+    #Save it through pickle
+    pickle.dump(matrix, open('Distances/matrix_eucl_0.p','wb'))
+    #Same for 'a1' reduction
     inputs1, alphabet, mapping1 = utilities.utils.ReduSeq(inputs, 'a1')
     matrix = euclid_matrix(mapping1)
     pickle.dump(matrix, open('Distances/matrix_eucl_1.p','wb'))
-
+    #Same for 'a2' reduction
     inputs2, alphabet, mapping2 = utilities.utils.ReduSeq(inputs, 'a2')
     matrix = euclid_matrix(mapping2)
     pickle.dump(matrix, open('Distances/matrix_eucl_2.p','wb'))
-
-
+    #Same for 'a3' reduction
     inputs3, alphabet, mapping3 = utilities.utils.ReduSeq(inputs, 'a3')
     matrix = euclid_matrix(mapping3)
     pickle.dump(matrix, open('Distances/matrix_eucl_3.p','wb'))
-
+    #Same for no reduction
     matrix = euclid_matrix(mapping)
     pickle.dump(matrix, open('Distances/matrix_eucl_N.p','wb'))
 
-def load_euclid_matrix(reduction_type):
+#%%
+def load_tonnetz_matrix(reduction_type):
+    '''
+    Loads a previously saved tonnetz costs matrix for a given type of reduction
+    an convert it in keras.backend tensor for using in the loss function of a
+    keras model.
+
+    Parameters
+    ----------
+    reduction_type: str
+        Defines which matrix is loaded.
+        Must be either 'N', 'a3', 'a2', 'a1' or 'a0'. If not, no matrix will be
+        loaded.
+
+    Returns
+    -------
+    tensor_matrix: keras.backend tensor of float32
+        The square matrix loaded and converted to tensor. Its shape depends of the type
+        of reduction selected.
+    '''
+    #Case: no reduction
     if reduction_type == 'N':
-        matrix = pickle.load(open('Distances/matrix_eucl_N.p','rb'))
+        #load the matrix
+        matrix = pickle.load(open('Distances/matrix_tonnetz_N.p', 'rb'))
+        #pop the first element which is empty
+        matrix.pop(0)
+        #convert to tensor
+        tensor_matrix = K.constant(matrix)
+    #Same as before
+    elif reduction_type == 'a3':
+        matrix = pickle.load(open('Distances/matrix_tonnetz_3.p', 'rb'))
         matrix.pop(0)
         tensor_matrix = K.constant(matrix)
+    #Same as before
+    elif reduction_type == 'a2':
+        matrix = pickle.load(open('Distances/matrix_tonnetz_2.p', 'rb'))
+        matrix.pop(0)
+        tensor_matrix = K.constant(matrix)
+    #Same as before
+    elif reduction_type == 'a1':
+        matrix = pickle.load(open('Distances/matrix_tonnetz_1.p', 'rb'))
+        matrix.pop(0)
+        tensor_matrix = K.constant(matrix)
+    #Same as before
+    elif reduction_type == 'a0':
+        matrix = pickle.load(open('Distances/matrix_tonnetz_0.p', 'rb'))
+        matrix.pop(0)
+        tensor_matrix = K.constant(matrix)
+    return tensor_matrix
+
+#%%
+def load_euclid_matrix(reduction_type):
+    '''
+    Loads a previously saved euclidian costs matrix for a given type of reduction
+    an convert it in keras.backend tensor for using in the loss function of a
+    keras model.
+
+    Parameters
+    ----------
+    reduction_type: str
+        Defines which matrix is loaded.
+        Must be either 'N', 'a3', 'a2', 'a1' or 'a0'. If not, no matrix will be
+        loaded.
+
+    Returns
+    -------
+    tensor_matrix: keras.backend tensor of float32
+        The square matrix loaded and converted to tensor. Its shape depends of the type
+        of reduction selected.
+    '''
+    #Case: no reduction
+    if reduction_type == 'N':
+        #Load the matrix
+        matrix = pickle.load(open('Distances/matrix_eucl_N.p','rb'))
+        #Pop the first element (empty)
+        matrix.pop(0)
+        #Convert to tensor
+        tensor_matrix = K.constant(matrix)
+    #Same for 'a3'
     elif reduction_type == 'a3':
         matrix = pickle.load(open('Distances/matrix_eucl_3.p','rb'))
         matrix.pop(0)
         tensor_matrix = K.constant(matrix)
+    #Same for 'a2'
     elif reduction_type == 'a2':
         matrix = pickle.load(open('Distances/matrix_eucl_2.p','rb'))
         matrix.pop(0)
         tensor_matrix = K.constant(matrix)
+    #Same for 'a1'
     elif reduction_type == 'a1':
         matrix = pickle.load(open('Distances/matrix_eucl_1.p','rb'))
         matrix.pop(0)
         tensor_matrix = K.constant(matrix)
+    #Same for 'a0'
     elif reduction_type == 'a0':
         matrix = pickle.load(open('Distances/matrix_eucl_0.p','rb'))
         matrix.pop(0)
