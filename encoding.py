@@ -18,13 +18,13 @@ def ParseInput():
     """
     
     #User interface to select the file
+    
     print('Choose an text input file')
     Tk().withdraw() 
     filename = filedialog.askopenfilename(
             initialdir = './Inputs/',
             filetypes = (("Template files", "*.txt"), ("All files", "*"))
             )
-    
     print('Database : ' + filename)
     print('Parsing input file...')
     fd = open(filename).read()
@@ -35,8 +35,6 @@ def ParseInput():
     indices_char = dict((i, c) for i, c in enumerate(chars))
     alphabet_len = len(char_indices)
     print('Alphabet size : ', alphabet_len)
-    #tf_chars = tf.constant(list(chars))
-    #tf_mapping = tf.contrib.lookup.index_to_string_table_from_tensor(tf_chars, default_value = 'N')
     return chord_seq, chars, (char_indices, indices_char)
 
 
@@ -45,7 +43,7 @@ def GetSentences(inputs, sentence_len, step):
     sentences = []
     next_chars = []
     for i in range(0, len(inputs) - sentence_len, step):
-        sentences.append(inputs[i: i + sentence_len])
+        sentences.append(inputs[i:i + sentence_len])
         next_chars.append(inputs[i + sentence_len])
     print('number of sequences :', len(sentences))
     return sentences, next_chars
@@ -56,8 +54,8 @@ def Encode(sentences, mapping, next_chars = None):
         nb_sentences = len(sentences)
         alphabet_len = len(mapping[0])
         sentence_len = len(sentences[0])
-        x = np.zeros((nb_sentences, sentence_len, alphabet_len), dtype=np.float32)
-        y = np.zeros((nb_sentences, alphabet_len), dtype=np.float32)
+        x = np.zeros((nb_sentences, sentence_len, alphabet_len), dtype=np.bool)
+        y = np.zeros((nb_sentences, alphabet_len), dtype=np.bool)
         for i, sentence in enumerate(sentences):
             for t, char in enumerate(sentence[:]):
                 x[i, t, mapping[0][char]] = 1

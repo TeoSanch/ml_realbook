@@ -11,7 +11,15 @@ from encoding import *
 import pdb
 from reduction import *
 
-def GenerateSentence(model, inputs, seed, nb_iteration, temperature, sentence_len, mapping, determinism = True, redu = 'N'):
+def GenerateSentence(model, 
+                     inputs, 
+                     seed, 
+                     nb_iteration, 
+                     temperature, 
+                     sentence_len, 
+                     mapping, 
+                     determinism=True, 
+                     redu='N'):
     '''Generate a number of word starting from a seed and a trained model
     Inputs : 
         model : the trained model
@@ -27,14 +35,20 @@ def GenerateSentence(model, inputs, seed, nb_iteration, temperature, sentence_le
     seed_sentence = GetSeed(seed, inputs, sentence_len, determinism)
     generated = seed_sentence
     sentence = seed_sentence
+    
     for i in range(nb_iteration):
-        prediction = GenerateWord(sentence, model, temperature, mapping, redu = redu)
+        prediction = GenerateWord(sentence, model, temperature, 
+                                  mapping, redu=redu)
         sentence.append(prediction)
         sentence = sentence[1:]
         generated.append(prediction)
     return generated
 
-def GenerateWord(sentence, model, temperature, mapping, redu = 'N'):
+def GenerateWord(sentence, 
+                 model, 
+                 temperature, 
+                 mapping, 
+                 redu = 'N'):
     ''' Generate a single word'''
     x = Encode(sentence, mapping)
     prediction = model.predict(x, verbose=0)[0]
@@ -49,14 +63,17 @@ def GenerateWord(sentence, model, temperature, mapping, redu = 'N'):
         return next_char
 
         
-def GetSeed(seed, inputs, sentence_len, determinism = True):
+def GetSeed(seed, 
+            inputs, 
+            sentence_len, 
+            determinism=True):
     ''' Starting from a sequence of chords, detect if the sequence is in the inputs and take a sequence adapted to the sentence length defined before
     determinist : if True, it takes the first sequence found, otherwise, it takes randomly one of the occurrence in the inputs'''
     seed = seed.split(' ')
     if len(seed) < sentence_len:
         indexes = []
         for i in range(len(inputs)):
-            if inputs[i:i+len(seed)] == seed:
+            if inputs[i : i+len(seed)] == seed:
                 indexes.append((i, i+len(seed)))
         if len(indexes) == 0:
             print('Invalide Seed')
@@ -64,7 +81,7 @@ def GetSeed(seed, inputs, sentence_len, determinism = True):
             index = indexes[0]
         else :
             index = random.choice(indexes)
-        seed_out = inputs[index[0]:index[0]+sentence_len]
+        seed_out = inputs[index[0] : index[0]+sentence_len]
         return seed_out
     else: 
         return seed
@@ -73,7 +90,7 @@ def Sample(predicted_probas, temperature=1.0):
     '''Resample the probabilities of the next generated chord
     If temperature > 1, increase the diversity'''
     tmp = np.log(predicted_probas) / temperature
-    tmp = np.exp(tmp)/np.sum(np.exp(tmp))
+    tmp = np.exp(tmp) / np.sum(np.exp(tmp))
     choices = range(len(tmp))
     return np.random.choice(choices, p=tmp)
 
