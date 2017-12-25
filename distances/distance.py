@@ -62,7 +62,7 @@ def distance_tonnetz(Chord1, Chord2):
     However, since these transformations only apply to major and minor chords,
     it might be necessary to reduce the input chords to one of those two types.
     A cost is added if the reduction is necessary.
-    
+
     '''
     #use Chords2Vec functions to get the chords roots and types
     root_1, type_1 = utilities.C2V.parse_mir_label(Chord1)
@@ -200,10 +200,29 @@ def distance_tonnetz(Chord1, Chord2):
 
     return cost
 
-
-#Perfom a  L-transform to the given chord
+#%%
 def L_transform(chord_root, chord_type):
     '''
+    The function transform the input chord by a L-transform in the Tonnetz
+    space. A minor chord becomes a major chord a major third down and a major
+    chord becomes a minor chord a major third up.
+
+    Parameters
+    ----------
+    chord_root: str
+        The chord's root (value must be from the root_list variable)
+    chord_type: str
+        The chord's type. If its value is not 'maj' or 'min', it will not be
+        changed by the function.
+
+    Returns
+    -------
+    chord_root: str
+        The chord's root after the L-transform
+        (value from the root_list variable)
+    chord_type: str
+        The chord's type after the L-transform
+        ('min', 'maj', or the initial value of chord_type)
     '''
     if chord_type == 'maj':
         n = (root_list.index(chord_root)+4) % 12
@@ -215,8 +234,30 @@ def L_transform(chord_root, chord_type):
         chord_type = 'maj'
     return chord_root, chord_type
 
-#Perform a R-transform to the given chord
+#%%
 def R_transform(chord_root, chord_type):
+    '''
+    The function transform the input chord by a R-transform in the Tonnetz
+    space. A minor chord becomes a major chord a minor third up and a major
+    chord becomes a minor chord a minor third down.
+
+    Parameters
+    ----------
+    chord_root: str
+        The chord's root (value must be from the root_list variable)
+    chord_type: str
+        The chord's type. If its value is not 'maj' or 'min', it will not be
+        changed by the function.
+
+    Returns
+    -------
+    chord_root: str
+        The chord's root after the R-transform
+        (value from the root_list variable)
+    chord_type: str
+        The chord's type after the R-transform
+        ('min', 'maj', or the initial value of chord_type)
+    '''
     if chord_type == 'maj':
         n = (root_list.index(chord_root)-3) % 12
         chord_root = root_list[n]
@@ -227,17 +268,58 @@ def R_transform(chord_root, chord_type):
         chord_type = 'maj'
     return chord_root, chord_type
 
-#Perform a P-transform to the given chord
+#%%
 def P_transform(chord_root, chord_type):
+    '''
+    The function transform the input chord by a P-transform in the Tonnetz
+    space. A minor chord becomes a major chord and a major chord becomes a minor
+    chord. The chord's root stay unchanged.
+
+    Parameters
+    ----------
+    chord_root: str
+        The chord's root.
+    chord_type: str
+        The chord's type. If its value is not 'maj' or 'min', it will not be
+        changed by the function.
+
+    Returns
+    -------
+    chord_root: str
+        The chord's root after the P-transform (no changes).
+    chord_type: str
+        The chord's type after the P-transform
+        ('min', 'maj', or the initial value of chord_type)
+    '''
     if chord_type == 'maj':
         chord_type = 'min'
     elif chord_type == 'min':
         chord_type = 'maj'
     return chord_root, chord_type
 
-
-#Count the cost of a given transform suite based on the transformation cost
+#%%
 def cost_count(suite, L_cost, R_cost, P_cost):
+    '''
+    The function calculates the cost of a given serie of Tonnetz transformations
+    using a specific cost for each transformation by iterating through a list
+    representing the serie.
+
+    Parameters
+    ----------
+    suite: list of char
+        The serie of Tonnetz transformation.
+    L_cost: float
+        Cost of an L-transformation.
+    R_cost: float
+        Cost of an R-transformation.
+    P_cost: float
+        Cost of a P-transformation.
+
+    Returns
+    -------
+    cost: float
+        The cost of the Tonnetz transformations serie.
+    '''
     cost = 0
     for i in suite:
         if i == 'L':
@@ -249,19 +331,45 @@ def cost_count(suite, L_cost, R_cost, P_cost):
 
     return cost
 
-
+#%%
 def tonnetz_matrix(mapping):
+    '''
+    The function ccalculates a matrix representing the costs of all possible
+    pair of chords in a given chord alphabet.
+
+    Parameters
+    ----------
+    mapping: tuple or list of dict
+            (given by the enconding functions from utilities)
+        A tuple or list containing on its second part a dictionnary associating
+        a number (key) and a chord (value).
+
+    The chords inside the mapping must be formatted like defined in the 
+    distance_tonnetz function.
+
+    Returns
+    -------
+    matrix: list of lists of floats
+        A matrix containing for each item (row i, column j) the tonnetz distance
+        of the two chords defined by keys i and j in the initial mapping.
+
+    Notes
+    -----
+    In the Choi RealBook dataset which we are using, there is 'Start' and 'End'
+    elements which bounds a given piece of music. Since we cannot calculate a
+    tonnetz distance for these elements, we state that the cost between them and
+    any other element will be given by the cost_start_end value.
+    '''
+    #Parse the dictionnary to chords and keys
     dict_alphabet = mapping[1]
     key, alphabet = zip(*dict_alphabet.items())
     key = list(key)
     alphabet = list(alphabet)
-
+    #define the cost of start and end statements
     cost_start_end = 2
-
     matrix  = [[]]
-
+    #loop over the elements in the dictionnary
     for i in key:
-        print(i)
         matrix_line = []
         for j in key:
             if (alphabet[i] in ['_START_','_END_','Start','End']
@@ -271,7 +379,6 @@ def tonnetz_matrix(mapping):
                 else:
                     matrix_line.append(cost_start_end)
             else:
-                #print(i,j)
                 cost = distance_tonnetz(alphabet[i], alphabet[j])
                 matrix_line.append(cost)
 
