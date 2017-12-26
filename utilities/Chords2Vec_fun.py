@@ -1,6 +1,14 @@
 #!/usr/bin/python3.5
 # -*-coding:Utf-8 -*
+'''
+This module developped by Jérôme Nika provides functions to change from string
+representation of chords to vector representation (either by activation vectors
+over semitones or vector of various length with numbers representing notes)
 
+
+Since this code is not ours, only the functions used for our model will be
+fully described.
+'''
 #############################################################################
 # Chords2Vec_fun.py
 # Jérôme Nika, IRCAM STMS LAB, 2017
@@ -76,6 +84,20 @@ def rel_semitone_vec_to_rel_chroma_vec(input_dict,
 
 
 def normalized_note(note):
+    '''
+    Return the normalized version of the input note to avoid dealing with
+    several representation of the same note
+
+    Parameters
+    ----------
+    note: str
+        The input note. Must be lower case only, or it will not be normalized.
+
+    Returns
+    -------
+    normalized_note: str
+        The normalized note.
+    '''
 	normalized_note = note
 	if note == 'db':
 		normalized_note = 'c#'
@@ -98,13 +120,27 @@ def normalized_note(note):
 	return normalized_note
 
 def delta_root(n1,
-				   n2):
+               n2):
     l = ['c', 'c#', 'd', 'eb', 'e', 'f', 'f#', 'g', 'g#', 'a', 'bb', 'b']
     p1 = l.index(normalized_note(n1))
     p2 = l.index(normalized_note(n2))
     return ((p2-p1+5) % 12)-5
 
 def parse_mir_label(label):
+    '''
+    Split a input chord between its root and type and normalize it.
+
+    Parameters
+    ----------
+    label: str
+        The input chord.
+        The chord must be written as follow: 'root:type'.
+
+    Returns
+    -------
+    label: list of string
+        The root and type of the normalized input chord.
+    '''
 	label = label.lower()
 	label = label.split(':')
 	if len(label) == 1:
@@ -114,12 +150,34 @@ def parse_mir_label(label):
 	return label
 
 def mir_label_to_semitones_vec(label):
+    '''
+    Change the input chord into a vector containing a number for each note of
+    the chord corresponding to its position in the semitone scale
+    (c = 0, c# = 1 etc...)
+
+    Parameters
+    ----------
+    label: str
+        The input chord.
+        The chord must be written as follow: 'root:type'.
+
+    Returns
+    -------
+    semi_vec: list of int
+        The chord described as numbers representing the notes.
+
+    Notes
+    -----
+    The function can only transform chords whose types are defined in the
+    chord_type_to_rel_tone_vec dictionnary.
+    '''
 	root, chord_type = parse_mir_label(label)
 	if root == 'n':
 		return [0]*4
 	vec = chordtype_to_rel_semitone_vec[chord_type]
 	delta = delta_root(root, 'c')
-	return [(i-delta) % 12 for i in vec]
+    semi_vec = [(i-delta) % 12 for i in vec]
+	return semi_vec
 
 def rotate(L, x):
 	return L[-x%len(L):] + L[:-x%len(L)]
