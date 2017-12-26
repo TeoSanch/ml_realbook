@@ -98,26 +98,26 @@ def normalized_note(note):
     normalized_note: str
         The normalized note.
     '''
-	normalized_note = note
-	if note == 'db':
-		normalized_note = 'c#'
-	elif note == 'd#':
-		normalized_note = 'eb'
-	elif note == 'gb':
-		normalized_note = 'f#'
-	elif note == 'ab':
-		normalized_note = 'g#'
-	elif note == 'a#':
-		normalized_note = 'bb'
-	elif note == 'e#':
-		normalized_note = 'f'
-	elif note == 'fb':
-		normalized_note = 'e'
-	elif note == 'b#':
-		normalized_note = 'c'
-	elif note == 'cb':
-		normalized_note = 'b'
-	return normalized_note
+    normalized_note = note
+    if note == 'db':
+        normalized_note = 'c#'
+    elif note == 'd#':
+        normalized_note = 'eb'
+    elif note == 'gb':
+        normalized_note = 'f#'
+    elif note == 'ab':
+        normalized_note = 'g#'
+    elif note == 'a#':
+        normalized_note = 'bb'
+    elif note == 'e#':
+        normalized_note = 'f'
+    elif note == 'fb':
+        normalized_note = 'e'
+    elif note == 'b#':
+        normalized_note = 'c'
+    elif note == 'cb':
+        normalized_note = 'b'
+    return normalized_note
 
 def delta_root(n1,
                n2):
@@ -141,13 +141,13 @@ def parse_mir_label(label):
     label: list of string
         The root and type of the normalized input chord.
     '''
-	label = label.lower()
-	label = label.split(':')
-	if len(label) == 1:
-		if label[0] == 'n':
-			return ['n', 'n']
-		label += ['maj']
-	return label
+    label = label.lower()
+    label = label.split(':')
+    if len(label) == 1:
+        if label[0] == 'n':
+            return ['n', 'n']
+        label += ['maj']
+    return label
 
 def mir_label_to_semitones_vec(label):
     '''
@@ -171,29 +171,28 @@ def mir_label_to_semitones_vec(label):
     The function can only transform chords whose types are defined in the
     chord_type_to_rel_tone_vec dictionnary.
     '''
-	root, chord_type = parse_mir_label(label)
-	if root == 'n':
-		return [0]*4
-	vec = chordtype_to_rel_semitone_vec[chord_type]
-	delta = delta_root(root, 'c')
+    root, chord_type = parse_mir_label(label)
+    if root == 'n':
+        return [0]*4
+    vec = chordtype_to_rel_semitone_vec[chord_type]
+    delta = delta_root(root, 'c')
     semi_vec = [(i-delta) % 12 for i in vec]
-	return semi_vec
+    return semi_vec
 
 def rotate(L, x):
 	return L[-x%len(L):] + L[:-x%len(L)]
 
 def mir_label_to_bin_chroma_vec(label,
                                 mode = 'bin'):
-	root, chord_type = parse_mir_label(label)
-	if root == 'n':
-		return [0]*12
-	chordtype_to_rel_bin_chroma_vec = rel_semitone_vec_to_rel_chroma_vec(
+    root, chord_type = parse_mir_label(label)
+    if root == 'n':
+        return [0]*12
+    chordtype_to_rel_bin_chroma_vec = rel_semitone_vec_to_rel_chroma_vec(
             chordtype_to_rel_semitone_vec,
             mode)
-	vec = chordtype_to_rel_bin_chroma_vec[chord_type]
-
-	delta = delta_root(root, 'c')
-	return rotate(vec,-delta)
+    vec = chordtype_to_rel_bin_chroma_vec[chord_type]
+    delta = delta_root(root, 'c')
+    return rotate(vec,-delta)
 
 def list_mir_label_to_list_vec(list_label,
                                mode='bin_chroma',
